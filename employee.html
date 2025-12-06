@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRBank - Employee Mode</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-turquoise: #00d9ff;
+            --secondary-turquoise: #00ffcc;
+            --dark-turquoise: #008b9e;
+            --bg-dark: #0a0a0f;
+            --bg-card: rgba(20, 20, 30, 0.85);
+            --text-primary: #ffffff;
+            --text-secondary: #a0d8e8;
+            --glow-primary: rgba(0, 217, 255, 0.4);
+            --glow-secondary: rgba(0, 255, 204, 0.3);
+            --red: #ba1c00;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, var(--primary-turquoise) 0%, transparent 70%);
+            top: -300px;
+            left: -300px;
+            opacity: 0.08;
+            animation: float 25s ease-in-out infinite;
+            z-index: 0;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--secondary-turquoise) 0%, transparent 70%);
+            bottom: -200px;
+            right: -200px;
+            opacity: 0.06;
+            animation: float 30s ease-in-out infinite reverse;
+            z-index: 0;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(100px, -100px) scale(1.1); }
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 200px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            padding: 25px 20px;
+            border-right: 1px solid rgba(0, 217, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: var(--glow-turquoise);
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: var(--glow-turquoise); }
+            50% { box-shadow: var(--glow-secondary); }
+        }
+
+        .mode-indicator {
+            margin-bottom: 30px;
+            font-size: 13px;
+            padding: 10px 14px;
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid rgba(255, 59, 48, 0.3);
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .mode-indicator .value {
+            color: #ff3b30;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: rgba(0, 217, 255, 0.3);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: var(--accent-gradient);
+            color: white;
+            box-shadow: var(--glow-turquoise);
+            transform: translateX(5px);
+        }
+
+        .nav-item.messages .badge {
+            width: 6px;
+            height: 6px;
+            background: #ef4444;
+            border-radius: 50%;
+            margin-left: auto;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 35px;
+            background: transparent;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .header-title {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-turquoise), var(--secondary-turquoise));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-box {
+            padding: 12px 16px;
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 10px;
+            font-size: 14px;
+            width: 300px;
+            transition: all 0.3s ease;
+            background: rgba(10, 10, 15, 0.6);
+            color: var(--text-primary);
+        }
+        
+        .search-box::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary-turquoise);
+            box-shadow: 0 0 20px var(--glow-primary);
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        .profile-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-turquoise), var(--secondary-turquoise));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-dark);
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px var(--glow-primary);
+        }
+
+        .profile-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 30px var(--glow-secondary);
+        }
+
+        /* Content Layout */
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+        }
+
+        /* User List */
+        .users-section {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .users-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-turquoise);
+            text-shadow: 0 0 20px var(--glow-primary);
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 12px;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .user-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-item:hover {
+            background: rgba(0, 217, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .user-item.active {
+            background: rgba(0, 217, 255, 0.15);
+            border: 1px solid var(--primary-turquoise);
+            box-shadow: 0 4px 20px var(--glow-primary);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #e8e8e8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-username {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .user-card {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Transactions Section */
+        .transactions-section {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 30px;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-turquoise);
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px var(--glow-primary);
+        }
+
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .transaction-item:hover {
+            padding-left: 10px;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            background: #e8e8e8;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .transaction-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: #666;
+            fill: none;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .transaction-amount {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .transaction-username {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Right Panel - Profile */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .profile-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 28px;
+            text-align: center;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background: #e8e8e8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 16px;
+        }
+
+        .profile-username {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: var(--text-primary);
+        }
+
+        .profile-field {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .profile-field-value {
+            color: var(--primary-turquoise);
+            font-weight: 700;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px 14px;
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--primary-turquoise);
+        }
+
+        .action-btn:hover {
+            background: rgba(0, 217, 255, 0.2);
+            border-color: var(--primary-turquoise);
+            box-shadow: 0 4px 15px var(--glow-primary);
+            transform: translateY(-2px);
+        }
+
+        /* Available Cards */
+        .available-cards {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 22px;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .cards-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--primary-turquoise);
+            text-shadow: 0 0 15px var(--glow-primary);
+        }
+
+        .card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 12px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .card-amount {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card-currency {
+            color: var(--text-secondary);
+            font-size: 11px;
+        }
+
+        .card-last-digits {
+            color: var(--text-secondary);
+        }
+
+        .card-type {
+            font-weight: 700;
+            color: var(--primary-turquoise);
+            text-shadow: 0 0 10px var(--glow-primary);
+        }
+
+        .card-display {
+            background: linear-gradient(135deg, var(--dark-turquoise) 0%, var(--primary-turquoise) 100%);
+            color: var(--bg-dark);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px var(--glow-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card-number-display {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .card-holder-name {
+            font-size: 11px;
+            margin-top: 8px;
+            opacity: 0.9;
+        }
+
+        .card-contactless {
+            font-size: 20px;
+        }
+
+        .logout-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-turquoise), var(--secondary-turquoise));
+            color: var(--bg-dark);
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 20px var(--glow-primary);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px var(--glow-primary);
+        }
+
+        @media (max-width: 1200px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .right-panel {
+                flex-direction: row;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                        <rect x="2" y="5" width="20" height="14" rx="2"/>
+                        <line x1="2" y1="10" x2="22" y2="10"/>
+                        <circle cx="6" cy="15" r="1" fill="currentColor"/>
+                        <line x1="10" y1="15" x2="14" y2="15"/>
+                    </svg>
+                </div>
+                <span>IRbank</span>
+            </div>
+
+            <div class="mode-indicator">
+                Mode: <span class="value" id="employeeRole">employee</span>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item active" data-page="employee.html">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                    </div>
+                    <span>Overview</span>
+                </li>
+                <!-- Added clickable messages navigation for employee -->
+                <li class="nav-item messages" data-page="employee-messages.html">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                            <line x1="2" y1="18" x2="9" y2="13"/>
+                            <line x1="22" y1="18" x2="15" y2="13"/>
+                        </svg>
+                    </div>
+                    <span>Messages</span>
+                    <div class="badge"></div>
+                </li>
+                <li class="nav-item" data-page="employee-account.html">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="8" r="5"/>
+                            <path d="M3 21c0-4.4 4-8 9-8s9 3.6 9 8"/>
+                            <circle cx="12" cy="8" r="2" fill="currentColor"/>
+                            <path d="M12 10c-1.1 0-2-.9-2-2"/>
+                        </svg>
+                    </div>
+                    <span>Account</span>
+                </li>
+                <li class="nav-item" id="dbProjectionNav" data-page="employee-iam.html" style="display: none;">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                        </svg>
+                    </div>
+                    <span>IAM & RBAC</span>
+                </li>
+                
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="header-title">Dashboard</h1>
+                <div class="header-right">
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                    <div class="profile-icon">👤</div>
+                </div>
+            </div>
+
+            <div class="content-wrapper">
+                <!-- Left Column - Users & Transactions -->
+                <div>
+                    <!-- Users List -->
+                    <div class="users-section">
+                        <h3 class="users-title">Choose User:</h3>
+                        <div id="users-list">
+                            <div class="user-item" style="padding: 20px; text-align: center; color: #666;">
+                                Loading users...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transactions -->
+                    <div class="transactions-section">
+                        <h3 class="section-title">Recent transactions</h3>
+                        <div id="transactions-list">
+                            <div style="padding: 20px; text-align: center; color: #666;">
+                                Select a user to view transactions
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel -->
+                <div class="right-panel">
+                    <!-- Profile Card -->
+                    <div class="profile-card" id="user-profile-card">
+                        <div class="profile-avatar">👤</div>
+                        <div class="profile-username" id="profile-username">Select a user</div>
+                        <div class="profile-field" id="profile-userid">UserID: -</div>
+                        <div class="profile-field" id="profile-email" style="margin-top: 8px; font-size: 12px; color: #666;">Email: -</div>
+                        <div class="profile-field" id="profile-balance" style="margin-top: 8px; font-size: 14px; font-weight: 600; color: #10b981;">Balance: $0.00</div>
+                        <div class="action-buttons">
+                            <button class="action-btn" id="send-message-btn" onclick="goToPage('employee-messages.html')" disabled>Send Message</button>
+                            <button class="action-btn" onclick="loadUserActivity()">See Activity</button>
+                        </div>
+                    </div>
+
+                    <!-- Available Cards -->
+                    <div class="available-cards" id="user-cards-section">
+                        <div class="cards-title">Available cards</div>
+                        <div id="cards-display">
+                            <div style="padding: 20px; text-align: center; color: #666; font-size: 14px;">
+                                Select a user to view cards
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        
+        // Check authentication and load employee data on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkEmployeeAuth();
+            await loadEmployeeData();
+            await loadUsers();
+        });
+
+        async function checkEmployeeAuth() {
+            try {
+                // Check if user is logged in and is an employee (not user)
+                const userType = sessionStorage.getItem('userType');
+                const employeeData = sessionStorage.getItem('employeeData');
+                
+                if (!employeeData || userType !== 'employee') {
+                    if (userType === 'user') {
+                        alert('You are logged in as a user. Redirecting to user dashboard...');
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        alert('Please login as an employee first');
+                        window.location.href = 'index.html';
+                    }
+                    return;
+                }
+                
+                console.log('Employee logged in');
+            } catch (error) {
+                console.error('Error checking employee auth:', error);
+                window.location.href = 'index.html';
+            }
+        }
+
+        async function loadEmployeeData() {
+            try {
+                const employeeData = sessionStorage.getItem('employeeData');
+                if (!employeeData) return;
+                
+                const employee = JSON.parse(employeeData);
+                
+                // Update profile display
+                const profileUsername = document.querySelector('.profile-username');
+                const profileField = document.querySelector('.profile-field');
+                
+                if (profileUsername) {
+                    profileUsername.textContent = `UserName: ${employee.username || 'N/A'}`;
+                }
+                if (profileField) {
+                    profileField.textContent = `UserID: ${employee.employee_id || employee.id}`;
+                }
+            } catch (error) {
+                console.error('Error loading employee data:', error);
+            }
+        }
+
+        let selectedUserId = null;
+        let allUsers = [];
+
+        async function loadUsers() {
+            try {
+                // Add cache busting to ensure fresh data
+                const response = await fetch(`${API_URL}/api/users?t=${Date.now()}`);
+                if (!response.ok) {
+                    throw new Error('Failed to load users');
+                }
+                
+                const users = await response.json();
+                allUsers = users;
+                displayUsersList(users);
+            } catch (error) {
+                console.error('Error loading users:', error);
+                const errorMessage = error.message || 'Unknown error';
+                document.getElementById('users-list').innerHTML = 
+                    `<div style="padding: 20px; text-align: center; color: #ef4444;">
+                        <p>Error loading users</p>
+                        <p style="font-size: 12px; color: #999; margin-top: 10px;">${errorMessage}</p>
+                        <p style="font-size: 12px; color: #999; margin-top: 10px;">Check console (F12) for details</p>
+                    </div>`;
+            }
+        }
+
+        function displayUsersList(users) {
+            const container = document.getElementById('users-list');
+            container.innerHTML = '';
+            
+            if (users.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #666;">
+                        <p>No users found</p>
+                        <p style="font-size: 12px; margin-top: 10px; color: #999;">
+                            Run: <code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">cd backend && python create_test_data.py</code>
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            users.forEach((user, index) => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                if (index === 0) {
+                    userItem.classList.add('active');
+                    selectedUserId = user.id;
+                    loadUserDetails(user.id);
+                }
+                
+                // Get user's first card and avatar
+                Promise.all([
+                    getUserFirstCard(user.id),
+                    getUserAvatarUrl(user.full_name || user.username || 'User', user.email || user.id, user.id)
+                ]).then(([cardNumber, avatarUrl]) => {
+                    const userName = user.full_name || user.username || 'User';
+                    userItem.innerHTML = `
+                        <div class="user-avatar">
+                            <img src="${avatarUrl}" alt="${userName}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='👤';">
+                        </div>
+                        <div class="user-info">
+                            <div class="user-username">${userName}</div>
+                            <div class="user-card">${cardNumber || 'No card'}</div>
+                        </div>
+                    `;
+                });
+                
+                userItem.onclick = () => selectUser(userItem, user.id);
+                container.appendChild(userItem);
+            });
+        }
+
+        async function getUserFirstCard(userId) {
+            try {
+                const response = await fetch(`${API_URL}/api/cards/user/${userId}`);
+                if (response.ok) {
+                    const cards = await response.json();
+                    if (cards && cards.length > 0) {
+                        return `•••• •••• •••• ${cards[0].card_number}`;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading card:', error);
+            }
+            return null;
+        }
+
+        function selectUser(element, userId) {
+            document.querySelectorAll('.user-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+            selectedUserId = userId;
+            loadUserDetails(userId);
+        }
+
+        async function loadUserDetails(userId) {
+            try {
+                // Load user info
+                const userResponse = await fetch(`${API_URL}/api/users/${userId}`);
+                if (!userResponse.ok) {
+                    throw new Error('Failed to load user');
+                }
+                const user = await userResponse.json();
+                
+                // Update profile card
+                const userName = user.full_name || user.username || 'User';
+                // Utiliser l'avatar_url de l'utilisateur s'il existe, sinon en générer un
+                const avatarUrl = user.avatar_url || await getUserAvatarUrl(userName, user.email || user.id, user.id);
+                const profileAvatar = document.querySelector('#user-profile-card .profile-avatar');
+                if (profileAvatar) {
+                    profileAvatar.innerHTML = `<img src="${avatarUrl}" alt="${userName}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" onerror="this.parentElement.innerHTML='👤';">`;
+                }
+                
+                // Si l'utilisateur n'a pas d'avatar, en générer un
+                if (!user.avatar_url) {
+                    try {
+                        const avatarResponse = await fetch(`${API_URL}/api/users/${user.id}/avatar`, { method: 'POST' });
+                        if (avatarResponse.ok) {
+                            const avatarData = await avatarResponse.json();
+                            if (profileAvatar) {
+                                profileAvatar.innerHTML = `<img src="${avatarData.avatar_url}" alt="${userName}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" onerror="this.parentElement.innerHTML='👤';">`;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error setting user avatar:', error);
+                    }
+                }
+                
+                document.getElementById('profile-username').textContent = `UserName: ${user.username || 'N/A'}`;
+                document.getElementById('profile-userid').textContent = `UserID: ${user.user_id || user.id}`;
+                document.getElementById('profile-email').textContent = `Email: ${user.email || 'N/A'}`;
+                document.getElementById('profile-balance').textContent = `Balance: $${(user.balance || 0).toFixed(2)}`;
+                document.getElementById('send-message-btn').disabled = false;
+                
+                // Load user cards
+                await loadUserCards(userId);
+                
+                // Load user transactions
+                await loadUserTransactions(userId);
+            } catch (error) {
+                console.error('Error loading user details:', error);
+            }
+        }
+
+        async function loadUserCards(userId) {
+            try {
+                const response = await fetch(`${API_URL}/api/cards/user/${userId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to load cards');
+                }
+                
+                const cards = await response.json();
+                displayUserCards(cards);
+            } catch (error) {
+                console.error('Error loading cards:', error);
+                document.getElementById('cards-display').innerHTML = 
+                    '<div style="padding: 20px; text-align: center; color: #666;">No cards found</div>';
+            }
+        }
+
+        function displayUserCards(cards) {
+            const container = document.getElementById('cards-display');
+            container.innerHTML = '';
+            
+            if (cards.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #666; font-size: 14px;">No cards available</div>';
+                return;
+            }
+            
+            // Display first card in detail
+            const primaryCard = cards[0];
+            const totalBalance = cards.reduce((sum, card) => sum + (card.balance || 0), 0);
+            
+            container.innerHTML = `
+                <div class="card-info">
+                    <span class="card-amount">${totalBalance.toLocaleString()} <span class="card-currency">EUR</span></span>
+                    <span class="card-last-digits">...${primaryCard.card_number}</span>
+                    <span class="card-type">${(primaryCard.card_type || 'CARD').toUpperCase()}</span>
+                </div>
+                <div class="card-display">
+                    <div>
+                        <div class="card-number-display">•••• •••• •••• ${primaryCard.card_number}</div>
+                        <div class="card-holder-name">${primaryCard.cardholder_name || 'Card Holder'}</div>
+                    </div>
+                    <div class="card-contactless"></div>
+                </div>
+            `;
+        }
+
+        async function loadUserTransactions(userId) {
+            try {
+                const response = await fetch(`${API_URL}/api/transactions/user/${userId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to load transactions');
+                }
+                
+                const transactions = await response.json();
+                displayUserTransactions(transactions);
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                document.getElementById('transactions-list').innerHTML = 
+                    '<div style="padding: 20px; text-align: center; color: #666;">No transactions found</div>';
+            }
+        }
+
+        function displayUserTransactions(transactions) {
+            const container = document.getElementById('transactions-list');
+            container.innerHTML = '';
+            
+            if (transactions.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">No transactions</div>';
+                return;
+            }
+            
+            // Show last 5 transactions
+            const recentTransactions = transactions.slice(0, 5);
+            
+            recentTransactions.forEach(transaction => {
+                const transactionItem = document.createElement('div');
+                transactionItem.className = 'transaction-item';
+                
+                const date = new Date(transaction.timestamp);
+                const formattedDate = date.toLocaleDateString('en-US', { 
+                    day: 'numeric', 
+                    month: 'short', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                const amountColor = transaction.transaction_type === 'credit' ? '#10b981' : '#ef4444';
+                const amountPrefix = transaction.transaction_type === 'credit' ? '+' : '-';
+                
+                transactionItem.innerHTML = `
+                    <div class="transaction-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <path d="M16 10a4 4 0 0 1-8 0"/>
+                        </svg>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="transaction-name">${transaction.merchant || transaction.description || 'Transaction'}</div>
+                        <div class="transaction-date">${formattedDate}</div>
+                    </div>
+                    <div>
+                        <div class="transaction-amount" style="color: ${amountColor}">${amountPrefix}$${Math.abs(transaction.amount).toFixed(2)}</div>
+                        <div class="transaction-username">${transaction.status || 'completed'}</div>
+                    </div>
+                `;
+                
+                container.appendChild(transactionItem);
+            });
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('user-search').value.toLowerCase();
+            if (!searchTerm) {
+                displayUsersList(allUsers);
+                return;
+            }
+            
+            const filteredUsers = allUsers.filter(user => 
+                (user.full_name && user.full_name.toLowerCase().includes(searchTerm)) ||
+                (user.username && user.username.toLowerCase().includes(searchTerm)) ||
+                (user.email && user.email.toLowerCase().includes(searchTerm))
+            );
+            
+            displayUsersList(filteredUsers);
+        }
+
+        function loadUserActivity() {
+            if (selectedUserId) {
+                loadUserTransactions(selectedUserId);
+            } else {
+                alert('Please select a user first');
+            }
+        }
+
+        document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+            item.addEventListener('click', () => {
+                const target = item.getAttribute('data-page');
+                if (target) {
+                    goToPage(target);
+                }
+            });
+        });
+
+        function goToPage(page) {
+            window.location.href = page;
+        }
+
+        // Generate avatar URL for user - Uses backend API for real person photos
+        async function getUserAvatarUrl(name, seed, userId = null) {
+            // Si l'utilisateur a déjà un avatar_url, l'utiliser
+            if (userId) {
+                try {
+                    const userResponse = await fetch(`${API_URL}/api/users/${userId}`);
+                    if (userResponse.ok) {
+                        const user = await userResponse.json();
+                        if (user.avatar_url) {
+                            return user.avatar_url;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching user avatar:', error);
+                }
+            }
+            
+            // Sinon, générer un nouvel avatar via l'API backend
+            try {
+                const response = await fetch(`${API_URL}/api/avatar/generate?name=${encodeURIComponent(name || 'User')}&seed=${encodeURIComponent(seed || name || 'default')}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.avatar_url;
+                }
+            } catch (error) {
+                console.error('Error generating avatar:', error);
+            }
+            
+            // Fallback: UI Avatars
+            const encodedName = encodeURIComponent(name || 'User');
+            return `https://ui-avatars.com/api/?name=${encodedName}&size=128&background=random&color=fff&bold=true&format=png`;
+        }
+        
+        // Synchronous version for immediate use (fallback)
+        function getUserAvatarUrlSync(name, seed) {
+            const encodedName = encodeURIComponent(name || 'User');
+            return `https://ui-avatars.com/api/?name=${encodedName}&size=128&background=random&color=fff&bold=true&format=png`;
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        // Check if employee is admin and update UI
+        (function checkAdminRole() {
+            const employeeData = sessionStorage.getItem('employeeData');
+            if (employeeData) {
+                try {
+                    const employee = JSON.parse(employeeData);
+                    if (employee.role === 'admin') {
+                        document.getElementById('employeeRole').textContent = 'admin';
+                        const dbProjectionNav = document.getElementById('dbProjectionNav');
+                        if (dbProjectionNav) {
+                            dbProjectionNav.style.display = 'flex';
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error parsing employee data:', e);
+                }
+            }
+        })();
+    </script>
+</body>
+</html>

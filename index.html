@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRBank - Authentication</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-turquoise: #00d9ff;
+            --secondary-turquoise: #00ffcc;
+            --dark-turquoise: #008b9e;
+            --dark-bg: #0a0a0f;
+            --card-bg: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0d8e8;
+            --accent-gradient: linear-gradient(135deg, #00d9ff 0%, #00ffcc 100%);
+            --glow-turquoise: 0 0 20px rgba(0, 217, 255, 0.6);
+            --glow-secondary: 0 0 20px rgba(0, 255, 204, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0f 0%, #0d1f1f 40%, #0a1520 60%, #0f0a1a 100%);
+            z-index: -2;
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.35) 0%, rgba(0, 217, 255, 0.15) 40%, transparent 70%);
+            border-radius: 50%;
+            top: -350px;
+            right: -350px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .animated-bg::after {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 255, 204, 0.3) 0%, rgba(0, 255, 204, 0.1) 40%, transparent 70%);
+            border-radius: 50%;
+            bottom: -300px;
+            left: -300px;
+            animation: float 15s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(100px, -100px) rotate(90deg); }
+            50% { transform: translate(0, -200px) rotate(180deg); }
+            75% { transform: translate(-100px, -100px) rotate(270deg); }
+        }
+
+        .auth-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Glass Morphism Panels */
+        .auth-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px 45px;
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .auth-panel:hover {
+            border-color: rgba(0, 255, 204, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), var(--glow-secondary);
+        }
+
+        .auth-panel.login-panel {
+            border-color: rgba(0, 217, 255, 0.2);
+        }
+
+        .auth-panel.login-panel:hover {
+            border-color: rgba(0, 255, 204, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), var(--glow-turquoise);
+        }
+
+        .auth-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .auth-logo {
+            width: 70px;
+            height: 70px;
+            background: var(--accent-gradient);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 32px;
+            box-shadow: var(--glow-turquoise);
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: var(--glow-turquoise); }
+            50% { box-shadow: var(--glow-secondary); }
+        }
+
+        .auth-logo-text {
+            font-size: 32px;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .auth-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.3;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(26, 26, 46, 0.6);
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-turquoise);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+            background: rgba(26, 26, 46, 0.8);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            margin-bottom: 14px;
+            color: var(--text-secondary);
+        }
+
+        .checkbox-group input {
+            accent-color: var(--primary-turquoise);
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .form-note {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .form-note a {
+            color: var(--primary-turquoise);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .form-note a:hover {
+            color: var(--secondary-turquoise);
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .role-button {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(26, 26, 46, 0.4);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .role-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--accent-gradient);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .role-button:hover {
+            border-color: var(--primary-turquoise);
+            transform: translateY(-2px);
+        }
+
+        .role-button.active {
+            background: var(--accent-gradient);
+            color: white;
+            border-color: transparent;
+            box-shadow: var(--glow-turquoise);
+        }
+
+        .role-button.active::before {
+            left: 0;
+        }
+
+        .form-button {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: var(--glow-turquoise);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .form-button:hover::before {
+            left: 100%;
+        }
+
+        .form-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--glow-turquoise), var(--glow-secondary);
+        }
+
+        .form-button:active {
+            transform: translateY(0);
+        }
+
+        .google-button {
+            width: 100%;
+            padding: 15px;
+            background: rgba(26, 26, 46, 0.6);
+            color: var(--text-primary);
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.2);
+        }
+
+        .google-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .google-button:hover::before {
+            left: 100%;
+        }
+
+        .google-button:hover {
+            background: rgba(26, 26, 46, 0.8);
+            border-color: var(--primary-turquoise);
+            transform: translateY(-2px);
+            box-shadow: var(--glow-turquoise);
+        }
+
+        .google-button:active {
+            transform: translateY(0);
+        }
+
+        .google-button .google-icon {
+            width: 20px;
+            height: 20px;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0 15px 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .divider::before {
+            margin-right: 15px;
+        }
+
+        .divider::after {
+            margin-left: 15px;
+        }
+
+        /* Style for Google button container */
+        #googleSignInDiv {
+            width: 100%;
+            margin-top: 0;
+            position: relative;
+        }
+
+        /* Wrapper effect around Google button */
+        #googleSignInDiv::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: var(--accent-gradient);
+            border-radius: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        #googleSignInDiv:hover::before {
+            opacity: 0.3;
+        }
+
+        /* Style the Google button itself */
+        #googleSignInDiv > div {
+            border-radius: 12px !important;
+            overflow: hidden !important;
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3) !important;
+            transition: all 0.3s ease !important;
+            border: 1px solid rgba(0, 217, 255, 0.3) !important;
+            backdrop-filter: blur(10px) !important;
+        }
+
+        #googleSignInDiv > div:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.6), 0 0 40px rgba(0, 255, 204, 0.4) !important;
+            border-color: var(--primary-turquoise) !important;
+        }
+
+        #googleSignInDiv > div:active {
+            transform: translateY(0);
+        }
+
+        /* Style the button content */
+        #googleSignInDiv iframe {
+            border-radius: 12px !important;
+        }
+
+        .login-help {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+        }
+
+        .login-help a {
+            color: var(--primary-turquoise);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-help a:hover {
+            color: var(--secondary-turquoise);
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        }
+
+        .login-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--accent-gradient);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 25px;
+            box-shadow: var(--glow-turquoise);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .icon-svg {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 968px) {
+            .auth-container {
+                grid-template-columns: 1fr;
+                padding: 10px;
+                gap: 15px;
+            }
+
+            .auth-panel {
+                padding: 35px 30px;
+            }
+
+            .auth-title {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    <div class="auth-container">
+        <!-- Sign Up Panel -->
+        <div class="auth-panel">
+            <h1 class="auth-title" style="font-size: 28px; margin-bottom: 16px;">Welcome, let's create an account</h1>
+
+            <form>
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" placeholder="Your full name">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-input" placeholder="Your username">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="text" id="signup-email" class="form-input" placeholder="Your email" required onblur="validateEmailField()">
+                    <div id="email-error" style="font-size: 11px; color: #ef4444; margin-top: 4px; display: none;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="signup-password" class="form-input" placeholder="Your password" onblur="validatePasswordField()">
+                    <div style="font-size: 10px; color: #888; margin-top: 2px; line-height: 1.3;">
+                        8+ chars, 1 uppercase, 1 symbol
+                    </div>
+                    <div id="password-error" style="font-size: 11px; color: #ef4444; margin-top: 4px; display: none;"></div>
+                </div>
+
+                <div class="role-selector">
+                    <button type="button" class="role-button active" onclick="selectRole(this, 'employee')">Employee</button>
+                    <button type="button" class="role-button" onclick="selectRole(this, 'user')">User</button>
+                </div>
+
+                <p class="form-note" style="font-size: 11px; margin-bottom: 14px;">By creating you agree to the terms</p>
+
+                <button type="button" class="form-button" onclick="handleSignup()">Sign up</button>
+            </form>
+        </div>
+
+        <!-- Login Panel -->
+        <div class="auth-panel login-panel">
+            <h1 class="auth-title" style="font-size: 28px; margin-bottom: 16px;">Log in to your account</h1>
+            <p class="form-note" style="margin-bottom: 16px; font-size: 11px; line-height: 1.4;">Secure access to your account</p>
+
+            <form>
+                <div class="role-selector" style="margin-bottom: 16px;">
+                    <button type="button" class="role-button" onclick="selectLoginRole(this, 'employee')">Employee</button>
+                    <button type="button" class="role-button active" onclick="selectLoginRole(this, 'user')">User</button>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" id="login-email" class="form-input" placeholder="Enter your username">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="login-password" class="form-input" placeholder="Enter your password">
+                </div>
+
+                <div class="login-help">
+                    <a href="reset-password.html">Forgot password?</a>
+                </div>
+
+                <button type="button" class="form-button" onclick="handleLogin()">Sign in</button>
+                
+                <div class="divider">ou</div>
+                
+                <div id="googleSignInDiv"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Google Sign-In Script -->
+    <script src="https://accounts.google.com/gsi/client" async defer onload="initGoogleSignIn()"></script>
+    <script>
+        // Google Client ID - IMPORTANT: Replace with your actual Google Client ID
+        const GOOGLE_CLIENT_ID = "746743477524-91r234b2de30vpqkfnhnm820ki1oo6rt.apps.googleusercontent.com";
+
+        // Initialize Google Sign-In when SDK is loaded
+        function initGoogleSignIn() {
+            try {
+                console.log('🔄 Initializing Google Sign-In...');
+                
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleGoogleLogin,
+                    auto_select: false,
+                    cancel_on_tap_outside: true
+                });
+
+                // Render the button
+                google.accounts.id.renderButton(
+                    document.getElementById("googleSignInDiv"),
+                    { 
+                        type: "standard",
+                        shape: "rectangular",
+                        theme: "filled_black",
+                        text: "signin_with",
+                        size: "large",
+                        width: 380,
+                        logo_alignment: "left"
+                    }
+                );
+
+                // Apply custom styles to the rendered button
+                setTimeout(() => {
+                    const googleBtn = document.querySelector('#googleSignInDiv > div');
+                    if (googleBtn) {
+                        googleBtn.style.marginTop = '0px';
+                        googleBtn.style.width = '100%';
+                        console.log('✅ Google Sign-In button rendered successfully');
+                    }
+                    
+                    // Style the iframe if present
+                    const iframe = document.querySelector('#googleSignInDiv iframe');
+                    if (iframe) {
+                        iframe.style.borderRadius = '12px';
+                    }
+                }, 100);
+
+            } catch (error) {
+                console.error('❌ Error initializing Google Sign-In:', error);
+            }
+        }
+
+        // Handle Google Sign-In response
+        async function handleGoogleLogin(response) {
+            try {
+                console.log('🔐 Google login initiated...');
+                const apiUrl = "http://localhost:8000";
+                
+                // Send Google credential to backend
+                const res = await fetch(`${apiUrl}/api/auth/google`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ credential: response.credential })
+                });
+
+                if (!res.ok) {
+                    const error = await res.json();
+                    alert(error.detail || "Google authentication failed");
+                    return;
+                }
+
+                const userData = await res.json();
+                console.log('✅ Google login successful');
+                
+                // Store user data and redirect
+                sessionStorage.setItem('userType', 'user');
+                sessionStorage.setItem('userId', userData.id);
+                sessionStorage.setItem('userData', JSON.stringify(userData));
+                
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                console.error('❌ Google login error:', error);
+                alert('Error connecting to server. Make sure the backend is running.');
+            }
+        }
+
+        // Sign up role selection
+        let signupRole = 'employee'; // default
+        
+        function selectRole(button, role) {
+            const buttons = button.parentElement.querySelectorAll('.role-button');
+            buttons.forEach(b => b.classList.remove('active'));
+            button.classList.add('active');
+            signupRole = role;
+        }
+
+        // Login role selection
+        let loginRole = 'user'; // default
+        
+        function selectLoginRole(button, role) {
+            const buttons = button.parentElement.querySelectorAll('.role-button');
+            buttons.forEach(b => b.classList.remove('active'));
+            button.classList.add('active');
+            loginRole = role;
+        }
+
+// Handle login (with MFA for both user and employee)
+async function handleLogin() {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+
+    if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
+    }
+
+    try {
+        const apiUrl = "http://localhost:8000";
+
+        // USER LOGIN FLOW (with MFA)
+        if (loginRole === "user") {
+            const response = await fetch(`${apiUrl}/api/users/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                // Special handling for blocked accounts
+                if (response.status === 403) {
+                    // Create a custom styled modal for blocked account
+                    const modal = document.createElement('div');
+                    modal.style.cssText = `
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0, 0, 0, 0.9);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 10000;
+                    `;
+                    
+                    const content = document.createElement('div');
+                    content.style.cssText = `
+                        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                        border: 2px solid #ff4444;
+                        border-radius: 20px;
+                        padding: 40px;
+                        max-width: 500px;
+                        text-align: center;
+                        box-shadow: 0 20px 60px rgba(255, 68, 68, 0.3);
+                        animation: slideIn 0.3s ease-out;
+                    `;
+                    
+                    content.innerHTML = `
+                        <style>
+                            @keyframes slideIn {
+                                from { transform: translateY(-50px); opacity: 0; }
+                                to { transform: translateY(0); opacity: 1; }
+                            }
+                        </style>
+                        <div style="font-size: 60px; margin-bottom: 20px;">🚫</div>
+                        <h2 style="color: #ff4444; font-size: 28px; margin-bottom: 20px; font-weight: 700;">
+                            COMPTE BLOQUÉ
+                        </h2>
+                        <div style="background: rgba(255, 68, 68, 0.1); border-left: 4px solid #ff4444; padding: 20px; margin: 20px 0; text-align: left; border-radius: 8px;">
+                            <p style="color: #fff; line-height: 1.6; margin: 0; white-space: pre-line;">${data.detail}</p>
+                        </div>
+                        <p style="color: #ccc; margin: 20px 0; font-size: 16px;">
+                            Votre accès a été temporairement suspendu par l'administrateur.
+                        </p>
+                        <div style="background: rgba(0, 217, 255, 0.1); border-radius: 10px; padding: 15px; margin: 20px 0;">
+                            <p style="color: #00d9ff; margin: 0; font-size: 14px;">
+                                Pour débloquer votre compte, veuillez contacter l'administrateur à<br>
+                                <strong style="font-size: 16px;">contact@irbank.com</strong>
+                            </p>
+                        </div>
+                        <button onclick="this.closest('div[style*=fixed]').remove()" style="
+                            background: linear-gradient(135deg, #00d9ff 0%, #00ffcc 100%);
+                            color: #000;
+                            border: none;
+                            padding: 15px 40px;
+                            font-size: 16px;
+                            font-weight: 600;
+                            border-radius: 10px;
+                            cursor: pointer;
+                            margin-top: 10px;
+                            transition: all 0.3s;
+                        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 25px rgba(0,217,255,0.4)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                            Retour à la connexion
+                        </button>
+                    `;
+                    
+                    modal.appendChild(content);
+                    document.body.appendChild(modal);
+                } else {
+                    alert(data.detail || "Invalid email or password");
+                }
+                return;
+            }
+
+            localStorage.setItem(
+                "pendingLogin",
+                JSON.stringify({
+                    role: "user",
+                    id: data.user_id,
+                    debugCode: data.debug_code || null
+                })
+            );
+            window.location.href = "verification.html";
+            return;
+        }
+
+        // EMPLOYEE LOGIN FLOW (also MFA)
+        if (loginRole === "employee") {
+            const response = await fetch(`${apiUrl}/api/employees/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                alert(data.detail || "Invalid email or password");
+                return;
+            }
+
+            localStorage.setItem(
+                "pendingLogin",
+                JSON.stringify({
+                    role: "employee",
+                    id: data.employee_id,
+                    debugCode: data.debug_code || null
+                })
+            );
+            window.location.href = "verification.html";
+        }
+
+    } catch (err) {
+        console.error("Login error:", err);
+        alert("Server error. Make sure backend is running.");
+    }
+}
+
+
+        // Real-time validation functions
+        function validateEmailField() {
+            const emailInput = document.getElementById('signup-email');
+            const errorDiv = document.getElementById('email-error');
+            if (!emailInput) return;
+            
+            const email = emailInput.value.trim();
+            const validation = validateEmail(email);
+            
+            if (email.length > 0 && !validation.valid) {
+                emailInput.style.borderColor = '#ef4444';
+                if (errorDiv) {
+                    errorDiv.textContent = validation.message;
+                    errorDiv.style.display = 'block';
+                }
+            } else {
+                emailInput.style.borderColor = '';
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                }
+            }
+        }
+
+        function validatePasswordField() {
+            const passwordInput = document.getElementById('signup-password');
+            const errorDiv = document.getElementById('password-error');
+            if (!passwordInput) return;
+            
+            const password = passwordInput.value;
+            const validation = validatePassword(password);
+            
+            if (password.length > 0 && !validation.valid) {
+                passwordInput.style.borderColor = '#ef4444';
+                if (errorDiv) {
+                    errorDiv.textContent = validation.message;
+                    errorDiv.style.display = 'block';
+                }
+            } else {
+                passwordInput.style.borderColor = '';
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                }
+            }
+        }
+
+        // Validation functions
+        function validateEmail(email) {
+            // Check if email exists and is a string
+            if (!email || typeof email !== 'string') {
+                return { valid: false, message: 'Email is required' };
+            }
+            
+            const trimmedEmail = email.trim();
+            
+            // Check if email is empty after trimming
+            if (trimmedEmail.length === 0) {
+                return { valid: false, message: 'Email is required' };
+            }
+            
+            // Check if email contains @
+            if (!trimmedEmail.includes('@')) {
+                return { valid: false, message: 'Email must contain @ symbol' };
+            }
+            
+            // Check if @ is not at the start or end
+            if (trimmedEmail.startsWith('@') || trimmedEmail.endsWith('@')) {
+                return { valid: false, message: 'Please enter a valid email address' };
+            }
+            
+            // Basic email format validation (must have @ and at least one dot after @)
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(trimmedEmail)) {
+                return { valid: false, message: 'Please enter a valid email address (format: user@domain.com)' };
+            }
+            
+            return { valid: true };
+        }
+
+        function validatePassword(password) {
+            // Check if password exists and is a string
+            if (!password || typeof password !== 'string') {
+                return { valid: false, message: 'Password is required' };
+            }
+            
+            // Check minimum length
+            if (password.length < 8) {
+                return { valid: false, message: 'Password must be at least 8 characters long' };
+            }
+            
+            // Check for uppercase letter
+            if (!/[A-Z]/.test(password)) {
+                return { valid: false, message: 'Password must contain at least one uppercase letter (A-Z)' };
+            }
+            
+            // Check for symbol
+            if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+                return { valid: false, message: 'Password must contain at least one symbol (!@#$%^&* etc.)' };
+            }
+            
+            return { valid: true };
+        }
+
+        // Handle signup
+        async function handleSignup() {
+            const form = document.querySelector('.auth-panel form');
+            const inputs = form.querySelectorAll('input');
+            const fullName = inputs[0].value.trim();
+            const username = inputs[1].value.trim();
+            const emailInput = document.getElementById('signup-email');
+            const passwordInput = document.getElementById('signup-password');
+            
+            const email = emailInput ? emailInput.value.trim() : inputs[2].value.trim();
+            const password = passwordInput ? passwordInput.value : inputs[3].value;
+            
+            // Clear previous error styles
+            if (emailInput) emailInput.style.borderColor = '';
+            if (passwordInput) passwordInput.style.borderColor = '';
+            
+            if (!fullName || !username || !email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // Validate email FIRST - STRICT VALIDATION
+            console.log('Validating email:', email);
+            const emailValidation = validateEmail(email);
+            console.log('Email validation result:', emailValidation);
+            
+            if (!emailValidation.valid) {
+                if (emailInput) {
+                    emailInput.style.borderColor = '#ef4444';
+                    emailInput.focus();
+                }
+                const errorDiv = document.getElementById('email-error');
+                if (errorDiv) {
+                    errorDiv.textContent = emailValidation.message;
+                    errorDiv.style.display = 'block';
+                }
+                alert(emailValidation.message);
+                return false; // Stop execution
+            }
+
+            // Validate password
+            console.log('Validating password:', password ? '***' : 'empty');
+            const passwordValidation = validatePassword(password);
+            console.log('Password validation result:', passwordValidation);
+            
+            if (!passwordValidation.valid) {
+                if (passwordInput) {
+                    passwordInput.style.borderColor = '#ef4444';
+                    passwordInput.focus();
+                }
+                const errorDiv = document.getElementById('password-error');
+                if (errorDiv) {
+                    errorDiv.textContent = passwordValidation.message;
+                    errorDiv.style.display = 'block';
+                }
+                alert(passwordValidation.message);
+                return false; // Stop execution
+            }
+            
+            // If we get here, validations passed
+            console.log('All validations passed, proceeding with signup');
+
+            try {
+                const apiUrl = 'http://localhost:8000';
+                
+                if (signupRole === 'user') {
+                    const response = await fetch(`${apiUrl}/api/users/register`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            full_name: fullName,
+                            username: username,
+                            email: email,
+                            password: password
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const user = await response.json();
+                        sessionStorage.setItem('userType', 'user');
+                        sessionStorage.setItem('userId', user.id);
+                        sessionStorage.setItem('userData', JSON.stringify(user));
+                        alert('Account created successfully!');
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        const error = await response.json();
+                        alert(error.detail || 'Failed to create account');
+                    }
+                } else if (signupRole === 'employee') {
+                    // For employee, we need department - using a default for now
+                    const response = await fetch(`${apiUrl}/api/employees/register`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            full_name: fullName,
+                            username: username,
+                            email: email,
+                            password: password,
+                            department: 'General' // Default department
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const employee = await response.json();
+                        sessionStorage.setItem('userType', 'employee');
+                        sessionStorage.setItem('employeeId', employee.id);
+                        sessionStorage.setItem('employeeData', JSON.stringify(employee));
+                        alert('Account created successfully!');
+                        window.location.href = 'employee.html';
+                    } else {
+                        const error = await response.json();
+                        alert(error.detail || 'Failed to create account');
+                    }
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                alert('Error connecting to server. Make sure the backend is running on http://localhost:8000');
+            }
+        }
+
+        function goToPage(page) {
+            window.location.href = page;
+        }
+    </script>
+</body>
+</html>
+

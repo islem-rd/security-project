@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRBank - User Messages</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-turquoise: #00d9ff;
+            --secondary-turquoise: #00ffcc;
+            --dark-turquoise: #008b9e;
+            --bg-dark: #0a0a0f;
+            --bg-card: rgba(20, 20, 30, 0.85);
+            --text-primary: #ffffff;
+            --text-secondary: #a0d8e8;
+            --accent-gradient: linear-gradient(135deg, #00d9ff 0%, #00ffcc 100%);
+            --glow-turquoise: 0 0 20px rgba(0, 217, 255, 0.6);
+            --glow-primary: rgba(0, 217, 255, 0.4);
+            --glow-secondary: rgba(0, 255, 204, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.25) 0%, rgba(0, 217, 255, 0.1) 40%, transparent 70%);
+            top: -350px;
+            right: -350px;
+            animation: float 20s ease-in-out infinite;
+            z-index: 0;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 255, 204, 0.2) 0%, rgba(0, 255, 204, 0.08) 40%, transparent 70%);
+            bottom: -300px;
+            left: -300px;
+            animation: float 15s ease-in-out infinite reverse;
+            z-index: 0;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(100px, -100px) rotate(90deg); }
+            50% { transform: translate(0, -200px) rotate(180deg); }
+            75% { transform: translate(-100px, -100px) rotate(270deg); }
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 200px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            padding: 25px 20px;
+            border-right: 1px solid rgba(0, 217, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: var(--glow-turquoise);
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: var(--glow-turquoise); }
+            50% { box-shadow: var(--glow-secondary); }
+        }
+
+        .mode-indicator {
+            margin-bottom: 30px;
+            font-size: 13px;
+            padding: 10px 14px;
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .mode-indicator .value {
+            color: var(--primary-turquoise);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: rgba(0, 217, 255, 0.3);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(0, 217, 255, 0.15);
+            color: var(--primary-turquoise);
+            border-color: rgba(0, 217, 255, 0.4);
+            transform: translateX(5px);
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        .logout-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-turquoise), var(--secondary-turquoise));
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 20px var(--glow-primary);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px var(--glow-primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 35px;
+            background: transparent;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header-title {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-turquoise), var(--secondary-turquoise));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px var(--glow-primary);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-turquoise), var(--secondary-turquoise));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-dark);
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px var(--glow-primary);
+        }
+        
+        .profile-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 30px var(--glow-secondary);
+        }
+
+        /* Messages List */
+        .messages-container {
+            max-width: 800px;
+        }
+
+        .message-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--primary-turquoise);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            position: relative;
+        }
+
+        .message-card:hover {
+            background: rgba(20, 20, 30, 0.95);
+            transform: translateX(8px);
+            border-left-color: var(--secondary-turquoise);
+            box-shadow: 0 10px 40px var(--glow-primary);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .message-from {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary-turquoise);
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .message-subject {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .message-preview {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .message-unread {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .unread-badge {
+            width: 10px;
+            height: 10px;
+            background: var(--primary-turquoise);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--glow-primary);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        /* Style for security alert cards */
+        .message-card.security-alert {
+            border-left-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            border: 2px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .message-card.security-alert:hover {
+            background: rgba(255, 107, 107, 0.15);
+            box-shadow: 0 10px 40px rgba(255, 107, 107, 0.3);
+        }
+
+        .alert-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-right: 8px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .alert-badge {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            animation: alertPulse 2s infinite;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.6);
+        }
+
+        @keyframes alertPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                        <rect x="2" y="5" width="20" height="14" rx="2"/>
+                        <line x1="2" y1="10" x2="22" y2="10"/>
+                        <circle cx="6" cy="15" r="1" fill="currentColor"/>
+                        <line x1="10" y1="15" x2="14" y2="15"/>
+                    </svg>
+                </div>
+                <span>IRbank</span>
+            </div>
+
+            <div class="mode-indicator">
+                Mode: <span class="value">user</span>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item" onclick="goToPage('dashboard.html')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                    </div>
+                    <span>Overview</span>
+                </li>
+                <li class="nav-item active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                            <line x1="2" y1="18" x2="9" y2="13"/>
+                            <line x1="22" y1="18" x2="15" y2="13"/>
+                        </svg>
+                    </div>
+                    <span>Messages</span>
+                </li>
+                <li class="nav-item" onclick="goToPage('user-account.html')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="8" r="5"/>
+                            <path d="M3 21c0-4.4 4-8 9-8s9 3.6 9 8"/>
+                            <circle cx="12" cy="8" r="2" fill="currentColor"/>
+                            <path d="M12 10c-1.1 0-2-.9-2-2"/>
+                        </svg>
+                    </div>
+                    <span>Account</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="header-title">Messages</h1>
+                <div class="header-right">
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                    <div class="profile-icon">👤</div>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messages-container">
+                <div style="padding: 40px; text-align: center; color: #666;">
+                    <div class="empty-icon">📬</div>
+                    <div class="empty-title">Loading messages...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        
+        // Check authentication and load messages on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkUserAuth();
+            await loadMessages();
+        });
+
+        async function checkUserAuth() {
+            try {
+                const userType = sessionStorage.getItem('userType');
+                const userData = sessionStorage.getItem('userData');
+                
+                if (!userData || userType !== 'user') {
+                    if (userType === 'employee') {
+                        alert('You are logged in as an employee. Redirecting to employee dashboard...');
+                        window.location.href = 'employee.html';
+                    } else {
+                        alert('Please login first');
+                        window.location.href = 'index.html';
+                    }
+                    return;
+                }
+            } catch (error) {
+                console.error('Error checking user auth:', error);
+                window.location.href = 'index.html';
+            }
+        }
+
+        async function loadMessages() {
+            try {
+                const userData = sessionStorage.getItem('userData');
+                if (!userData) return;
+                
+                const user = JSON.parse(userData);
+                const userId = user.id;
+                
+                const response = await fetch(`${API_URL}/api/messages/user/${userId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to load messages');
+                }
+                
+                const messages = await response.json();
+                displayMessages(messages);
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                document.getElementById('messages-container').innerHTML = 
+                    '<div style="padding: 40px; text-align: center; color: #666;"><div class="empty-icon">📭</div><div class="empty-title">No messages</div><p style="margin-top: 10px; color: #999;">You have no messages yet.</p></div>';
+            }
+        }
+
+        function displayMessages(messages) {
+            const container = document.getElementById('messages-container');
+            container.innerHTML = '';
+            
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 40px; text-align: center; color: #666;">
+                        <div class="empty-icon">📭</div>
+                        <div class="empty-title">No messages</div>
+                        <p style="margin-top: 10px; color: #999;">You have no messages yet.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const alerts = messages.filter(m => m.is_security_alert);
+            const normalMessages = messages.filter(m => !m.is_security_alert);
+            
+            // Display alerts first
+            alerts.forEach(message => {
+                createAlertCard(container, message);
+            });
+            
+            // Then display normal messages
+            normalMessages.forEach(message => {
+                createMessageCard(container, message);
+            });
+        }
+
+        function createAlertCard(container, message) {
+            const messageCard = document.createElement('div');
+            messageCard.className = 'message-card security-alert';
+            
+            const date = new Date(message.created_at);
+            const timeAgo = getTimeAgo(date);
+            
+            // Get sender name
+            const senderName = message.sender ? (message.sender.full_name || message.sender.username || 'System Alert') : 'Security System';
+            
+            messageCard.innerHTML = `
+                <div class="message-header">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="alert-icon">
+                            <span>⚠️</span>
+                            <span>SECURITY ALERT</span>
+                        </div>
+                        <div class="message-from">${senderName}</div>
+                    </div>
+                    <div class="message-time">${timeAgo}</div>
+                </div>
+                <div class="message-subject" style="color: #ef4444; font-weight: 700; margin-top: 10px;">
+                    🛡️ ${message.subject || 'Security Threat Detected'}
+                </div>
+                <div class="message-preview" style="margin-top: 12px; padding: 12px; background: white; border-radius: 6px; border-left: 3px solid #ef4444;">
+                    ${message.content || 'A security threat has been detected and blocked.'}
+                </div>
+                ${!message.is_read ? `
+                    <div class="message-unread">
+                        <div class="unread-badge" style="background: #ef4444;"></div>
+                        <span style="font-size: 12px; color: #ef4444; font-weight: 600;">Unread Alert</span>
+                    </div>
+                ` : ''}
+            `;
+            
+            messageCard.onclick = async () => {
+                if (!message.is_read) {
+                    try {
+                        await fetch(`${API_URL}/api/messages/${message.id}/read`, { method: 'PUT' });
+                        message.is_read = true;
+                        loadMessages();
+                    } catch (error) {
+                        console.error('Error marking message as read:', error);
+                    }
+                }
+            };
+            
+            container.appendChild(messageCard);
+        }
+
+        function createMessageCard(container, message) {
+            const messageCard = document.createElement('div');
+            messageCard.className = 'message-card';
+            
+            const date = new Date(message.created_at);
+            const timeAgo = getTimeAgo(date);
+            
+            const senderName = message.sender ? (message.sender.full_name || message.sender.username || 'Employee') : 'IRBank Support';
+            
+            messageCard.innerHTML = `
+                <div class="message-header">
+                    <div class="message-from">${senderName}</div>
+                    <div class="message-time">${timeAgo}</div>
+                </div>
+                <div class="message-subject">${message.subject || 'No subject'}</div>
+                <div class="message-preview">${message.content || ''}</div>
+                ${!message.is_read ? `
+                    <div class="message-unread">
+                        <div class="unread-badge"></div>
+                        <span style="font-size: 12px; color: #0066ff;">New</span>
+                    </div>
+                ` : ''}
+            `;
+            
+            messageCard.onclick = async () => {
+                if (!message.is_read) {
+                    try {
+                        await fetch(`${API_URL}/api/messages/${message.id}/read`, { method: 'PUT' });
+                        message.is_read = true;
+                        loadMessages();
+                    } catch (error) {
+                        console.error('Error marking message as read:', error);
+                    }
+                }
+            };
+            
+            container.appendChild(messageCard);
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diff = now - date;
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+            if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+            return 'Just now';
+        }
+
+        function goToPage(page) {
+            window.location.href = page;
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRBank - User Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-turquoise: #00d9ff;
+            --secondary-turquoise: #00ffcc;
+            --dark-turquoise: #008b9e;
+            --dark-bg: #0a0a0f;
+            --bg-card: rgba(20, 20, 30, 0.85);
+            --card-bg: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0d8e8;
+            --accent-gradient: linear-gradient(135deg, #00d9ff 0%, #00ffcc 100%);
+            --glow-turquoise: 0 0 20px rgba(0, 217, 255, 0.6);
+            --glow-secondary: 0 0 20px rgba(0, 255, 204, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 50%, #0f0a1a 100%);
+            z-index: -2;
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -250px;
+            right: -250px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .animated-bg::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 255, 204, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -200px;
+            animation: float 15s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(100px, -100px) rotate(90deg); }
+            50% { transform: translate(0, -200px) rotate(180deg); }
+            75% { transform: translate(-100px, -100px) rotate(270deg); }
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 200px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            padding: 25px 20px;
+            border-right: 1px solid rgba(0, 217, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: var(--glow-turquoise);
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: var(--glow-turquoise); }
+            50% { box-shadow: var(--glow-secondary); }
+        }
+
+        .mode-indicator {
+            margin-bottom: 30px;
+            font-size: 13px;
+            padding: 10px 14px;
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .mode-indicator .value {
+            color: var(--primary-turquoise);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: rgba(0, 217, 255, 0.3);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(0, 217, 255, 0.15);
+            color: var(--primary-turquoise);
+            border-color: rgba(0, 217, 255, 0.4);
+            transform: translateX(5px);
+        }
+
+        .nav-item.messages .badge {
+            width: 6px;
+            height: 6px;
+            background: #ef4444;
+            border-radius: 50%;
+            margin-left: auto;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            background: transparent;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .header-title {
+            font-size: 36px;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-icon {
+            width: 55px;
+            height: 55px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            font-size: 26px;
+            transition: all 0.3s ease;
+            box-shadow: var(--glow-turquoise);
+            border: 2px solid rgba(0, 217, 255, 0.3);
+        }
+
+        .profile-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: var(--glow-turquoise), var(--glow-secondary);
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* Credit Card */
+        .credit-card {
+            background: var(--accent-gradient);
+            border-radius: 20px;
+            padding: 32px;
+            color: white;
+            box-shadow: var(--glow-turquoise), 0 10px 40px rgba(0, 0, 0, 0.4);
+            min-height: 240px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .credit-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .credit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--glow-turquoise), var(--glow-secondary), 0 15px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .card-chip {
+            width: 44px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        .card-contactless {
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .card-number {
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin: 20px 0 12px 0;
+            font-weight: 500;
+        }
+
+        .card-holder {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* Upcoming Payments */
+        .upcoming-payments {
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .payment-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .payment-icon {
+            width: 44px;
+            height: 44px;
+            background: #e8e8e8;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            flex-shrink: 0;
+        }
+
+        .payment-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        .payment-info {
+            flex: 1;
+        }
+
+        .payment-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .payment-detail {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .payment-amount {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        /* Right Column */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* Spending Card */
+        .spending-card {
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 45, 117, 0.2);
+            border-radius: 20px;
+            padding: 26px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .spending-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .spending-label {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .spending-amount {
+            font-size: 36px;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .spending-badge {
+            background: var(--accent-gradient);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            box-shadow: var(--glow-turquoise);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .spending-chart {
+            height: 120px;
+            background: linear-gradient(180deg, rgba(0, 102, 255, 0.1) 0%, transparent 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            opacity: 0.4;
+            min-height: 20px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chart-bar:hover {
+            opacity: 0.6;
+        }
+
+        .chart-bar.active {
+            background: var(--accent-gradient);
+            opacity: 1;
+            box-shadow: var(--glow-turquoise);
+            transform: scaleY(1.1);
+        }
+
+        .chart-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #888;
+        }
+
+        /* Available Cards */
+        .available-cards {
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .card-info-row:hover {
+            background: rgba(0, 217, 255, 0.05);
+            transform: translateX(5px);
+        }
+
+        .card-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .card-currency {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .card-type {
+            font-weight: 700;
+            color: var(--primary-turquoise);
+            text-transform: uppercase;
+        }
+
+        /* Transactions */
+        .transactions {
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+
+        .transaction-item:hover {
+            background: rgba(0, 217, 255, 0.05);
+            transform: translateX(5px);
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent-gradient);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            flex-shrink: 0;
+            box-shadow: var(--glow-turquoise);
+        }
+
+        .transaction-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .transaction-amount {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .transaction-type {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .transaction-type.in {
+            color: var(--primary-turquoise);
+            background: rgba(0, 217, 255, 0.2);
+            border: 1px solid var(--primary-turquoise);
+        }
+
+        .transaction-type.out {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #ff6b6b;
+        }
+
+        .logout-btn {
+            padding: 12px 24px;
+            background: var(--accent-gradient);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: var(--glow-turquoise);
+            border: 2px solid rgba(0, 217, 255, 0.3);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--glow-turquoise), var(--glow-secondary);
+        }
+
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                border-right: none;
+                border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+                padding: 20px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .header-title {
+                font-size: 28px;
+            }
+
+            .content-grid {
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                        <rect x="2" y="5" width="20" height="14" rx="2"/>
+                        <line x1="2" y1="10" x2="22" y2="10"/>
+                        <circle cx="6" cy="15" r="1" fill="currentColor"/>
+                        <line x1="10" y1="15" x2="14" y2="15"/>
+                    </svg>
+                </div>
+                <span>IRbank</span>
+            </div>
+
+            <div class="mode-indicator">
+                Mode: <span class="value">user</span>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                    </div>
+                    <span>Overview</span>
+                </li>
+                <!-- Added clickable messages navigation -->
+                <li class="nav-item messages" onclick="goToPage('user-messages.html')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            <line x1="9" y1="10" x2="15" y2="10"/>
+                            <line x1="9" y1="14" x2="13" y2="14"/>
+                        </svg>
+                    </div>
+                    <span>Messages</span>
+                    <div class="badge"></div>
+                </li>
+                <li class="nav-item" onclick="goToPage('user-account.html')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </div>
+                    <span>Account</span>
+                </li>
+                
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="header-title">Dashboard</h1>
+                <div class="header-right">
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                    <div class="profile-icon" id="user-profile-icon">👤</div>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Left Column -->
+                <div class="card-section">
+                    <!-- Credit Card -->
+                    <div class="credit-card" id="credit-card-display">
+                        <div class="card-top">
+                            <div class="card-chip"></div>
+                            <div class="card-contactless"></div>
+                        </div>
+                        <div>
+                            <div class="card-number" id="card-number">•••• •••• •••• ••••</div>
+                            <div class="card-holder" id="card-holder">No card available</div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Payments -->
+                    <div class="upcoming-payments">
+                        <h3 class="section-title">Upcoming payments</h3>
+                        <div class="payment-item" id="salary-payment">
+                            <div class="payment-icon">
+                                <svg viewBox="0 0 24 24" stroke-width="2">
+                                    <path d="M21 6H3a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2z"/>
+                                    <path d="M3 10h18"/>
+                                </svg>
+                            </div>
+                            <div class="payment-info">
+                                <div class="payment-name">Monthly Salary</div>
+                                <div class="payment-detail">Regular payment</div>
+                            </div>
+                            <div class="payment-amount" id="salary-amount">$0.00</div>
+                        </div>
+                        <div class="payment-item" style="margin-top: 12px;">
+                            <div class="payment-icon" style="background: #e8f5e9;">
+                                <svg viewBox="0 0 24 24" stroke-width="2" stroke="#10b981">
+                                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                </svg>
+                            </div>
+                            <div class="payment-info">
+                                <div class="payment-name">Account Balance</div>
+                                <div class="payment-detail">Available funds</div>
+                            </div>
+                            <div class="payment-amount" id="account-balance" style="color: #10b981;">$0.00</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Transactions -->
+                    <div class="transactions">
+                        <h3 class="section-title">Recent transactions</h3>
+                        <div id="transactions-list">
+                            <div style="padding: 20px; text-align: center; color: #666;">
+                                Loading transactions...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="right-column">
+                    <!-- Spending Chart -->
+                    <div class="spending-card">
+                        <div class="spending-header">
+                            <div>
+                                <div class="spending-label">Spent this day</div>
+                                <div class="spending-amount" id="spent-today">$0.00</div>
+                            </div>
+                        </div>
+                        <div class="spending-chart">
+                            <div class="chart-bar"></div>
+                            <div class="chart-bar"></div>
+                            <div class="chart-bar active"></div>
+                            <div class="chart-bar"></div>
+                            <div class="chart-bar"></div>
+                            <div class="chart-bar"></div>
+                            <div class="chart-bar"></div>
+                        </div>
+                        <div class="chart-labels">
+                            <span>Sun</span>
+                            <span>Mon</span>
+                            <span>Tue</span>
+                            <span>Wed</span>
+                            <span>Thu</span>
+                            <span>Fri</span>
+                            <span>Sat</span>
+                        </div>
+                    </div>
+
+                    <!-- Available Cards -->
+                    <div class="available-cards">
+                        <h3 class="section-title">Available cards</h3>
+                        <div id="available-cards-list">
+                            <div class="card-info-row">
+                                <span class="card-amount">0 <span class="card-currency">EUR</span></span>
+                                <span>No cards</span>
+                                <span class="card-type">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        
+        // Load user data and cards on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadUserData();
+            await loadUserCards();
+            await loadTransactions();
+        });
+        
+        // Reload data when page becomes visible (user returns from account page)
+        document.addEventListener('visibilitychange', async () => {
+            if (!document.hidden) {
+                // Page is now visible, reload user data to reflect any changes
+                await loadUserData();
+                await loadUserCards();
+                await loadTransactions();
+            }
+        });
+        
+        // Also reload on focus (when user switches back to this tab)
+        window.addEventListener('focus', async () => {
+            await loadUserData();
+            await loadUserCards();
+            await loadTransactions();
+        });
+
+        async function loadUserData() {
+            try {
+                // Check if user is logged in and is a user (not employee)
+                const userType = sessionStorage.getItem('userType');
+                const userData = sessionStorage.getItem('userData');
+                
+                if (!userData || userType !== 'user') {
+                    if (userType === 'employee') {
+                        alert('You are logged in as an employee. Redirecting to employee dashboard...');
+                        window.location.href = 'employee.html';
+                    } else {
+                        alert('Please login first');
+                        window.location.href = 'index.html';
+                    }
+                    return;
+                }
+                
+                let user = JSON.parse(userData);
+                const userId = user.id;
+                
+                // Reload user data from API to get latest updates
+                try {
+                    const response = await fetch(`${API_URL}/api/users/${userId}?t=${Date.now()}`);
+                    if (response.ok) {
+                        const updatedUser = await response.json();
+                        // Update sessionStorage with fresh data
+                        sessionStorage.setItem('userData', JSON.stringify(updatedUser));
+                        user = updatedUser;
+                    }
+                } catch (error) {
+                    console.error('Error fetching updated user data:', error);
+                    // Continue with cached data if API fails
+                }
+                
+                // Update salary and balance display
+                const salary = user.salary || 0;
+                const balance = user.balance || 0;
+                document.getElementById('salary-amount').textContent = `$${salary.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                document.getElementById('account-balance').textContent = `$${balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                
+                // Update profile avatar
+                const userName = user.full_name || user.username || 'User';
+                // Utiliser l'avatar_url de l'utilisateur s'il existe, sinon en générer un
+                const avatarUrl = user.avatar_url || await getUserAvatarUrl(userName, user.email || user.id, user.id);
+                const profileIcon = document.getElementById('user-profile-icon');
+                if (profileIcon) {
+                    profileIcon.innerHTML = `<img src="${avatarUrl}" alt="${userName}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; cursor: pointer;" onerror="this.parentElement.innerHTML='👤';">`;
+                }
+                
+                // Si l'utilisateur n'a pas d'avatar, en générer un
+                if (!user.avatar_url) {
+                    try {
+                        const avatarResponse = await fetch(`${API_URL}/api/users/${user.id}/avatar`, { method: 'POST' });
+                        if (avatarResponse.ok) {
+                            const avatarData = await avatarResponse.json();
+                            if (profileIcon) {
+                                profileIcon.innerHTML = `<img src="${avatarData.avatar_url}" alt="${userName}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; cursor: pointer;" onerror="this.parentElement.innerHTML='👤';">`;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error setting user avatar:', error);
+                    }
+                }
+                
+                console.log('User logged in:', userName);
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                window.location.href = 'index.html';
+            }
+        }
+
+        async function loadUserCards() {
+            try {
+                const userData = sessionStorage.getItem('userData');
+                if (!userData) {
+                    return;
+                }
+                
+                const user = JSON.parse(userData);
+                const userId = user.id;
+                
+                // Add cache busting to ensure fresh data
+                const response = await fetch(`${API_URL}/api/cards/user/${userId}?t=${Date.now()}`);
+                if (!response.ok) {
+                    throw new Error('Failed to load cards');
+                }
+                
+                const cards = await response.json();
+                
+                if (cards && cards.length > 0) {
+                    // Display first card in main card display
+                    const primaryCard = cards[0];
+                    displayPrimaryCard(primaryCard);
+                    
+                    // Display all cards in available cards section
+                    displayAvailableCards(cards);
+                } else {
+                    // No cards available
+                    document.getElementById('card-number').textContent = '•••• •••• •••• ••••';
+                    document.getElementById('card-holder').textContent = 'No card available';
+                }
+            } catch (error) {
+                console.error('Error loading cards:', error);
+                // If Stripe is not configured, show a message
+                if (error.message.includes('Stripe')) {
+                    document.getElementById('card-holder').textContent = 'Stripe not configured';
+                }
+            }
+        }
+
+        function displayPrimaryCard(card) {
+            // Format card number: show full number if available, otherwise show last 4 digits with asterisks
+            let formattedNumber;
+            if (card.full_card_number) {
+                // Format full number: 4242 4242 4242 4242
+                const fullNumber = card.full_card_number.replace(/\s/g, '');
+                formattedNumber = fullNumber.match(/.{1,4}/g).join(' ');
+            } else {
+                // Fallback to masked number
+                formattedNumber = `•••• •••• •••• ${card.card_number}`;
+            }
+            document.getElementById('card-number').textContent = formattedNumber;
+            document.getElementById('card-holder').textContent = card.cardholder_name || 'Card Holder';
+        }
+
+        function displayAvailableCards(cards) {
+            const container = document.getElementById('available-cards-list');
+            container.innerHTML = '';
+            
+            cards.forEach(card => {
+                const cardRow = document.createElement('div');
+                cardRow.className = 'card-info-row';
+                
+                const balance = card.balance || 0;
+                const cardType = (card.card_type || 'CARD').toUpperCase();
+                
+                // Display full card number if available, otherwise show last 4 digits
+                let cardNumberDisplay;
+                if (card.full_card_number) {
+                    const fullNumber = card.full_card_number.replace(/\s/g, '');
+                    cardNumberDisplay = fullNumber.match(/.{1,4}/g).join(' ');
+                } else {
+                    cardNumberDisplay = `•••• •••• •••• ${card.card_number}`;
+                }
+                
+                cardRow.innerHTML = `
+                    <span class="card-amount">${balance.toLocaleString()} <span class="card-currency">EUR</span></span>
+                    <span style="font-family: monospace; font-size: 12px;">${cardNumberDisplay}</span>
+                    <span class="card-type">${cardType}</span>
+                `;
+                
+                container.appendChild(cardRow);
+            });
+        }
+
+        async function loadTransactions() {
+            try {
+                const userData = sessionStorage.getItem('userData');
+                if (!userData) {
+                    document.getElementById('transactions-list').innerHTML = 
+                        '<div style="padding: 20px; text-align: center; color: #666;">Please login first</div>';
+                    return;
+                }
+                
+                const user = JSON.parse(userData);
+                const userId = user.id;
+                
+                if (!userId) {
+                    throw new Error('User ID not found');
+                }
+                
+                const response = await fetch(`${API_URL}/api/transactions/user/${userId}`);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Error:', response.status, errorText);
+                    throw new Error(`Failed to load transactions: ${response.status} ${errorText}`);
+                }
+                
+                const transactions = await response.json();
+                
+                if (!Array.isArray(transactions)) {
+                    console.error('Invalid response format:', transactions);
+                    throw new Error('Invalid response format from server');
+                }
+                
+                displayTransactions(transactions);
+                calculateSpentToday(transactions);
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                const errorMessage = error.message || 'Unknown error';
+                document.getElementById('transactions-list').innerHTML = 
+                    `<div style="padding: 20px; text-align: center; color: #ef4444;">
+                        <p>Error loading transactions</p>
+                        <p style="font-size: 12px; color: #999; margin-top: 10px;">${errorMessage}</p>
+                        <p style="font-size: 12px; color: #999; margin-top: 10px;">Check console (F12) for details</p>
+                    </div>`;
+            }
+        }
+
+        function displayTransactions(transactions) {
+            const container = document.getElementById('transactions-list');
+            container.innerHTML = '';
+            
+            if (transactions.length === 0) {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">No transactions found</div>';
+                return;
+            }
+            
+            // Sort by timestamp (most recent first) and show last 5
+            const sortedTransactions = transactions.sort((a, b) => {
+                const dateA = new Date(a.timestamp);
+                const dateB = new Date(b.timestamp);
+                return dateB - dateA;
+            });
+            
+            const recentTransactions = sortedTransactions.slice(0, 5);
+            
+            recentTransactions.forEach(transaction => {
+                const transactionItem = document.createElement('div');
+                transactionItem.className = 'transaction-item';
+                
+                // Handle timestamp - can be timestamp or created_at
+                let transactionDate;
+                if (transaction.timestamp) {
+                    transactionDate = new Date(transaction.timestamp);
+                } else if (transaction.created_at) {
+                    transactionDate = new Date(transaction.created_at);
+                } else {
+                    transactionDate = new Date(); // Fallback to current date
+                }
+                
+                // Check if date is valid
+                if (isNaN(transactionDate.getTime())) {
+                    transactionDate = new Date(); // Fallback to current date if invalid
+                }
+                
+                const formattedDate = transactionDate.toLocaleDateString('en-US', { 
+                    day: 'numeric', 
+                    month: 'short', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                // Determine icon and styling based on transaction type
+                const isCredit = transaction.transaction_type === 'credit';
+                const amountColor = isCredit ? '#10b981' : '#ef4444';
+                const amountPrefix = isCredit ? '+' : '-';
+                const transactionType = isCredit ? 'in' : 'out';
+                const typeLabel = isCredit ? 'Money in' : 'Money out';
+                
+                // Choose icon based on merchant/description
+                let iconPath = '<path d="M9 22h6M12 15v7M2 10h20l-1-5H3l-1 5z"/>'; // Default shopping icon
+                const merchant = (transaction.merchant || transaction.description || '').toLowerCase();
+                if (merchant.includes('salary') || merchant.includes('deposit') || merchant.includes('bonus')) {
+                    iconPath = '<path d="M21 6H3a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2z"/><path d="M3 10h18"/>'; // Card/money icon
+                } else if (merchant.includes('gas') || merchant.includes('fuel')) {
+                    iconPath = '<path d="M12 2v20M3 12h18"/>'; // Gas pump icon
+                } else if (merchant.includes('restaurant') || merchant.includes('food')) {
+                    iconPath = '<path d="M12 2C8 2 4 5 4 9c0 6 8 12 8 12s8-6 8-12c0-4-4-7-8-7z"/>'; // Location/food icon
+                } else if (merchant.includes('gym') || merchant.includes('fitness')) {
+                    iconPath = '<path d="M12 2C8 2 4 5 4 9c0 6 8 12 8 12s8-6 8-12c0-4-4-7-8-7z"/>'; // Location icon
+                } else if (merchant.includes('plane') || merchant.includes('flight') || merchant.includes('travel')) {
+                    iconPath = '<path d="M9 22h6M12 15v7M2 10h20l-1-5H3l-1 5z"/>'; // Shopping/travel icon
+                }
+                
+                transactionItem.innerHTML = `
+                    <div class="transaction-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2">
+                            ${iconPath}
+                        </svg>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="transaction-name">${transaction.merchant || transaction.description || 'Transaction'}</div>
+                        <div class="transaction-date">${formattedDate}</div>
+                    </div>
+                    <div>
+                        <div class="transaction-amount" style="color: ${amountColor}">${amountPrefix}$${Math.abs(transaction.amount).toFixed(2)}</div>
+                        <div class="transaction-type ${transactionType}">${typeLabel}</div>
+                    </div>
+                `;
+                
+                container.appendChild(transactionItem);
+            });
+        }
+
+        function calculateSpentToday(transactions) {
+            try {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                // Filter transactions from today that are debits (money out)
+                const todayDebits = transactions.filter(transaction => {
+                    let transactionDate;
+                    if (transaction.timestamp) {
+                        transactionDate = new Date(transaction.timestamp);
+                    } else if (transaction.created_at) {
+                        transactionDate = new Date(transaction.created_at);
+                    } else {
+                        return false;
+                    }
+                    
+                    transactionDate.setHours(0, 0, 0, 0);
+                    
+                    // Check if transaction is from today and is a debit
+                    return transactionDate.getTime() === today.getTime() && 
+                           transaction.transaction_type === 'debit';
+                });
+                
+                // Calculate total spent today
+                const totalSpent = todayDebits.reduce((sum, transaction) => {
+                    return sum + (Math.abs(transaction.amount) || 0);
+                }, 0);
+                
+                // Update the display
+                const spentTodayElement = document.getElementById('spent-today');
+                if (spentTodayElement) {
+                    spentTodayElement.textContent = `$${totalSpent.toFixed(2)}`;
+                }
+            } catch (error) {
+                console.error('Error calculating spent today:', error);
+            }
+        }
+
+        function goToPage(page) {
+            window.location.href = page;
+        }
+
+        // Generate avatar URL for user - Uses backend API for real person photos
+        async function getUserAvatarUrl(name, seed, userId = null) {
+            // Si l'utilisateur a déjà un avatar_url, l'utiliser
+            if (userId) {
+                try {
+                    const userResponse = await fetch(`${API_URL}/api/users/${userId}`);
+                    if (userResponse.ok) {
+                        const user = await userResponse.json();
+                        if (user.avatar_url) {
+                            return user.avatar_url;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching user avatar:', error);
+                }
+            }
+            
+            // Sinon, générer un nouvel avatar via l'API backend
+            try {
+                const response = await fetch(`${API_URL}/api/avatar/generate?name=${encodeURIComponent(name || 'User')}&seed=${encodeURIComponent(seed || name || 'default')}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.avatar_url;
+                }
+            } catch (error) {
+                console.error('Error generating avatar:', error);
+            }
+            
+            // Fallback: UI Avatars
+            const encodedName = encodeURIComponent(name || 'User');
+            return `https://ui-avatars.com/api/?name=${encodedName}&size=128&background=random&color=fff&bold=true&format=png`;
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

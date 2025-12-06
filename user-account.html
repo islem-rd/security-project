@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRBank - Account Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-turquoise: #00d9ff;
+            --secondary-turquoise: #00ffcc;
+            --dark-turquoise: #008b9e;
+            --dark-bg: #0a0a0f;
+            --bg-card: rgba(20, 20, 30, 0.85);
+            --card-bg: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0d8e8;
+            --accent-gradient: linear-gradient(135deg, #00d9ff 0%, #00ffcc 100%);
+            --glow-turquoise: 0 0 20px rgba(0, 217, 255, 0.6);
+            --glow-secondary: 0 0 20px rgba(0, 255, 204, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 50%, #0f0a1a 100%);
+            z-index: -2;
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -250px;
+            right: -250px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .animated-bg::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 255, 204, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -200px;
+            animation: float 15s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(100px, -100px) rotate(90deg); }
+            50% { transform: translate(0, -200px) rotate(180deg); }
+            75% { transform: translate(-100px, -100px) rotate(270deg); }
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Sidebar - Same as dashboard */
+        .sidebar {
+            width: 200px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            padding: 25px 20px;
+            border-right: 1px solid rgba(0, 217, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: var(--glow-turquoise);
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: var(--glow-turquoise); }
+            50% { box-shadow: var(--glow-secondary); }
+        }
+
+        .mode-indicator {
+            margin-bottom: 30px;
+            font-size: 13px;
+            padding: 10px 14px;
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .mode-indicator .value {
+            color: var(--primary-turquoise);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: rgba(0, 217, 255, 0.3);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(0, 217, 255, 0.15);
+            color: var(--primary-turquoise);
+            border-color: rgba(0, 217, 255, 0.4);
+            transform: translateX(5px);
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        .logout-btn {
+            padding: 12px 24px;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: var(--glow-turquoise);
+            border: 2px solid rgba(0, 217, 255, 0.3);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--glow-turquoise), var(--glow-pink);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            background: transparent;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .header-title {
+            font-size: 36px;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-icon {
+            width: 55px;
+            height: 55px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            font-size: 26px;
+            transition: all 0.3s ease;
+            box-shadow: var(--glow-turquoise);
+            border: 2px solid rgba(0, 217, 255, 0.3);
+        }
+
+        .profile-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: var(--glow-turquoise), var(--glow-secondary);
+        }
+
+        /* Settings Sections */
+        .settings-container {
+            max-width: 900px;
+        }
+
+        .settings-section {
+            background: rgba(26, 26, 46, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .settings-section:hover {
+            border-color: rgba(0, 255, 204, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), var(--glow-secondary);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid rgba(0, 217, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(26, 26, 46, 0.6);
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-turquoise);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+            background: rgba(26, 26, 46, 0.8);
+        }
+
+        .form-input:disabled {
+            background: rgba(26, 26, 46, 0.3);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .form-help {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .form-error {
+            font-size: 11px;
+            color: #ef4444;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .form-error.show {
+            display: block;
+        }
+
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: white;
+            box-shadow: var(--glow-turquoise);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--glow-turquoise), var(--glow-secondary);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary-turquoise);
+            transform: translateY(-2px);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .success-message {
+            background: rgba(0, 217, 255, 0.2);
+            color: var(--primary-turquoise);
+            border: 2px solid var(--primary-turquoise);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: none;
+            font-weight: 600;
+            box-shadow: var(--glow-turquoise);
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .empty-state {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .card-select {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(26, 26, 46, 0.6);
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+        }
+
+        .card-select:focus {
+            outline: none;
+            border-color: var(--primary-turquoise);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+            background: rgba(26, 26, 46, 0.8);
+        }
+
+        .card-select option {
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        .transaction-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .transaction-form .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                border-right: none;
+                border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+                padding: 20px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .header-title {
+                font-size: 28px;
+            }
+
+            .transaction-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg"></div>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                        <rect x="2" y="5" width="20" height="14" rx="2"/>
+                        <line x1="2" y1="10" x2="22" y2="10"/>
+                        <circle cx="6" cy="15" r="1" fill="currentColor"/>
+                        <line x1="10" y1="15" x2="14" y2="15"/>
+                    </svg>
+                </div>
+                <span>IRbank</span>
+            </div>
+
+            <div class="mode-indicator">
+                Mode: <span class="value">user</span>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item" onclick="goToPage('dashboard.html')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                    </div>
+                    <span>Overview</span>
+                </li>
+                <li class="nav-item" onclick="goToPage('user-messages.html')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            <line x1="9" y1="10" x2="15" y2="10"/>
+                            <line x1="9" y1="14" x2="13" y2="14"/>
+                        </svg>
+                    </div>
+                    <span>Messages</span>
+                </li>
+                <li class="nav-item active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                            <path d="M16 11h4M18 9v4"/>
+                        </svg>
+                    </div>
+                    <span>Account</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="header-title">Account Settings</h1>
+                <div class="header-right">
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                    <div class="profile-icon" id="user-profile-icon">👤</div>
+                </div>
+            </div>
+
+            <div class="settings-container">
+                <div id="success-message" class="success-message"></div>
+
+                <!-- Email Section -->
+                <div class="settings-section">
+                    <h2 class="section-title">Email</h2>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="text" id="email-input" class="form-input" placeholder="your.email@example.com">
+                        <div class="form-error" id="email-error"></div>
+                        <div class="form-help">Your email address for account notifications</div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="updateEmail()">Update Email</button>
+                    </div>
+                </div>
+
+                <!-- Username Section -->
+                <div class="settings-section">
+                    <h2 class="section-title">Username</h2>
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" id="username-input" class="form-input" placeholder="your_username">
+                        <div class="form-error" id="username-error"></div>
+                        <div class="form-help">Username must be unique and not already in use</div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="updateUsername()">Update Username</button>
+                    </div>
+                </div>
+
+                <!-- Password Section -->
+                <div class="settings-section">
+                    <h2 class="section-title">Password</h2>
+                    <div class="form-group">
+                        <label class="form-label">New Password</label>
+                        <input type="password" id="password-input" class="form-input" placeholder="Enter new password">
+                        <div class="form-error" id="password-error"></div>
+                        <div class="form-help">Must be at least 8 characters with 1 uppercase letter and 1 symbol</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" id="password-confirm-input" class="form-input" placeholder="Confirm new password">
+                        <div class="form-error" id="password-confirm-error"></div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="updatePassword()">Update Password</button>
+                    </div>
+                </div>
+
+                <!-- Credit Card Section -->
+                <div class="settings-section">
+                    <h2 class="section-title">Existing Credit Cards</h2>
+                    <div id="card-management-empty" class="empty-state" style="display: none;">
+                        You don't have any cards yet. Add a card below to enable card number updates.
+                    </div>
+                    <div id="card-update-fields">
+                        <div class="form-group">
+                            <label class="form-label">Select Card</label>
+                            <select id="card-select" class="card-select">
+                                <option value="">Loading cards...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Card Type</label>
+                            <select id="card-type-select" class="card-select">
+                                <option value="visa">Visa</option>
+                                <option value="mastercard">Mastercard</option>
+                                <option value="amex">American Express</option>
+                                <option value="discover">Discover</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <div class="form-help">Select the card type</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Card Number (16 digits)</label>
+                            <input type="text" id="card-number-input" class="form-input" placeholder="4242 4242 4242 4242" maxlength="19">
+                            <div class="form-error" id="card-error"></div>
+                            <div class="form-help">Enter full 16-digit card number</div>
+                        </div>
+                        <div class="btn-group">
+                            <button id="update-card-btn" class="btn btn-primary" onclick="updateCardNumber()">Update Card Number</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Card Section -->
+                <div class="settings-section">
+                    <h2 class="section-title">Add a New Credit Card</h2>
+                    <form id="add-card-form" onsubmit="createCreditCard(event)">
+                        <div class="form-group">
+                            <label class="form-label">Cardholder Name</label>
+                            <input type="text" id="new-card-name" class="form-input" placeholder="Name on card" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Card Number (16 digits)</label>
+                            <input type="text" id="new-card-number" class="form-input" placeholder="4242 4242 4242 4242" maxlength="19" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Expiry Date (MM/YY)</label>
+                            <input type="text" id="new-card-expiry" class="form-input" placeholder="08/28" maxlength="5" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">CVV</label>
+                            <input type="text" id="new-card-cvv" class="form-input" placeholder="123" maxlength="4" required>
+                            <div class="form-help">We only use this to create the card token for demos.</div>
+                        </div>
+                        <div class="form-error" id="new-card-error"></div>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">Add Card</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetAddCardForm()">Clear</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Salary Section -->
+                <div class="settings-section">
+                    <h2 class="section-title">Salary</h2>
+                    <div class="form-group">
+                        <label class="form-label">Monthly Salary ($)</label>
+                        <input type="number" id="salary-input" class="form-input" placeholder="0.00" step="0.01" min="0">
+                        <div class="form-error" id="salary-error"></div>
+                        <div class="form-help">Your monthly salary amount</div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="updateSalary()">Update Salary</button>
+                    </div>
+                </div>
+
+                <!-- Add Transaction Section -->
+                <div class="settings-section">
+                    <h2 class="section-title">Add Transaction</h2>
+                    <form class="transaction-form" onsubmit="addTransaction(event)">
+                        <div class="form-group">
+                            <label class="form-label">Select Card (Optional)</label>
+                            <select id="transaction-card-select" class="card-select">
+                                <option value="">No card (optional)</option>
+                            </select>
+                            <div class="form-help">You can add a transaction without linking it to a card</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Merchant/Description</label>
+                            <input type="text" id="transaction-merchant" class="form-input" placeholder="e.g., Supermarket" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Amount ($)</label>
+                            <input type="number" id="transaction-amount" class="form-input" placeholder="0.00" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Transaction Type</label>
+                            <select id="transaction-type" class="card-select" required>
+                                <option value="debit">Debit (Money Out)</option>
+                                <option value="credit">Credit (Money In)</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Description</label>
+                            <input type="text" id="transaction-description" class="form-input" placeholder="Transaction description">
+                        </div>
+                        <div class="btn-group full-width">
+                            <button type="submit" class="btn btn-primary">Add Transaction</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetTransactionForm()">Clear</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let currentUser = null;
+        let userCards = [];
+
+        // Load user data on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkUserAuth();
+            await loadUserData();
+            await loadUserCards();
+        });
+
+        async function checkUserAuth() {
+            try {
+                const userType = sessionStorage.getItem('userType');
+                const userData = sessionStorage.getItem('userData');
+                
+                if (!userData || userType !== 'user') {
+                    if (userType === 'employee') {
+                        alert('You are logged in as an employee. Redirecting to employee dashboard...');
+                        window.location.href = 'employee.html';
+                    } else {
+                        alert('Please login first');
+                        window.location.href = 'index.html';
+                    }
+                    return;
+                }
+            } catch (error) {
+                console.error('Error checking user auth:', error);
+                window.location.href = 'index.html';
+            }
+        }
+
+        async function loadUserData() {
+            try {
+                const userData = sessionStorage.getItem('userData');
+                if (!userData) return;
+                
+                currentUser = JSON.parse(userData);
+                
+                // Populate form fields
+                document.getElementById('email-input').value = currentUser.email || '';
+                document.getElementById('username-input').value = currentUser.username || '';
+                document.getElementById('salary-input').value = currentUser.salary || 0;
+                
+                // Update avatar
+                const userName = currentUser.full_name || currentUser.username || 'User';
+                const avatarUrl = currentUser.avatar_url || await getUserAvatarUrl(userName, currentUser.email || currentUser.id, currentUser.id);
+                const profileIcon = document.getElementById('user-profile-icon');
+                if (profileIcon) {
+                    profileIcon.innerHTML = `<img src="${avatarUrl}" alt="${userName}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; cursor: pointer;" onerror="this.parentElement.innerHTML='👤';">`;
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        async function loadUserCards() {
+            try {
+                const userData = sessionStorage.getItem('userData');
+                if (!userData) return;
+                
+                const user = JSON.parse(userData);
+                const response = await fetch(`${API_URL}/api/cards/user/${user.id}`);
+                
+                if (response.ok) {
+                    userCards = await response.json();
+                    
+                    // Populate card selects
+                    const cardSelect = document.getElementById('card-select');
+                    const transactionCardSelect = document.getElementById('transaction-card-select');
+                    const cardTypeSelect = document.getElementById('card-type-select');
+                    const cardNumberInput = document.getElementById('card-number-input');
+                    const updateButton = document.getElementById('update-card-btn');
+                    
+                    cardSelect.innerHTML = '<option value="">Select a card...</option>';
+                    transactionCardSelect.innerHTML = '<option value="">No card (optional)</option>';
+                    
+                    userCards.forEach(card => {
+                        const cardOption = `<option value="${card.id}">...${card.card_number} (${card.card_type?.toUpperCase() || 'CARD'})</option>`;
+                        cardSelect.innerHTML += cardOption;
+                        transactionCardSelect.innerHTML += cardOption;
+                    });
+                    
+                    const hasCards = userCards.length > 0;
+                    toggleCardManagementState(hasCards);
+                    
+                    // If user has a card, pre-select it and load its number
+                    if (hasCards) {
+                        cardSelect.value = userCards[0].id;
+                        if (userCards[0].full_card_number) {
+                            const formattedNumber = userCards[0].full_card_number.replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') || userCards[0].full_card_number;
+                            document.getElementById('card-number-input').value = formattedNumber;
+                        }
+                        cardSelect.disabled = false;
+                        cardTypeSelect.disabled = false;
+                        cardNumberInput.disabled = false;
+                        if (updateButton) updateButton.disabled = false;
+                    } else {
+                        cardSelect.innerHTML = '<option value="">No cards available</option>';
+                        cardSelect.disabled = true;
+                        cardTypeSelect.disabled = true;
+                        cardNumberInput.value = '';
+                        cardNumberInput.disabled = true;
+                        if (updateButton) updateButton.disabled = true;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading cards:', error);
+            }
+        }
+
+        function toggleCardManagementState(hasCards) {
+            const emptyState = document.getElementById('card-management-empty');
+            const cardFields = document.getElementById('card-update-fields');
+            if (!emptyState || !cardFields) return;
+            
+            emptyState.style.display = hasCards ? 'none' : 'block';
+            cardFields.style.display = hasCards ? 'block' : 'none';
+        }
+
+        // Card selection change handler
+        document.getElementById('card-select').addEventListener('change', function() {
+            const selectedCardId = this.value;
+            const selectedCard = userCards.find(card => card.id == selectedCardId);
+            const cardTypeSelect = document.getElementById('card-type-select');
+            
+            if (selectedCard) {
+                // Update card number
+                if (selectedCard.full_card_number) {
+                    const formattedNumber = selectedCard.full_card_number.replace(/\s/g, '').match(/.{1,4}/g)?.join(' ') || selectedCard.full_card_number;
+                    document.getElementById('card-number-input').value = formattedNumber;
+                } else {
+                    document.getElementById('card-number-input').value = '';
+                }
+                
+                // Update card type
+                if (selectedCard.card_type) {
+                    cardTypeSelect.value = selectedCard.card_type.toLowerCase();
+                }
+            } else {
+                document.getElementById('card-number-input').value = '';
+                cardTypeSelect.value = 'visa';
+            }
+        });
+
+        async function updateEmail() {
+            const emailInput = document.getElementById('email-input');
+            const errorDiv = document.getElementById('email-error');
+            const email = emailInput.value.trim();
+            
+            // Clear previous errors
+            errorDiv.classList.remove('show');
+            emailInput.style.borderColor = '';
+            
+            // Validate email
+            const emailValidation = validateEmail(email);
+            if (!emailValidation.valid) {
+                errorDiv.textContent = emailValidation.message;
+                errorDiv.classList.add('show');
+                emailInput.style.borderColor = '#ef4444';
+                return;
+            }
+            
+            try {
+                console.log('Updating email:', email);
+                const response = await fetch(`${API_URL}/api/users/${currentUser.id}/email`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+                
+                console.log('Email update response status:', response.status);
+                
+                if (response.ok) {
+                    const updatedUser = await response.json();
+                    console.log('Email updated successfully:', updatedUser);
+                    currentUser = updatedUser;
+                    sessionStorage.setItem('userData', JSON.stringify(updatedUser));
+                    showSuccess('Email updated successfully!');
+                    errorDiv.classList.remove('show');
+                    emailInput.style.borderColor = '';
+                    // Update the input field with the new value
+                    emailInput.value = updatedUser.email;
+                } else {
+                    const error = await response.json();
+                    console.error('Email update error:', error);
+                    errorDiv.textContent = error.detail || 'Failed to update email';
+                    errorDiv.classList.add('show');
+                    emailInput.style.borderColor = '#ef4444';
+                }
+            } catch (error) {
+                console.error('Error updating email:', error);
+                errorDiv.textContent = `Error updating email: ${error.message || 'Please try again'}`;
+                errorDiv.classList.add('show');
+                emailInput.style.borderColor = '#ef4444';
+            }
+        }
+
+        async function updateUsername() {
+            const usernameInput = document.getElementById('username-input');
+            const errorDiv = document.getElementById('username-error');
+            const username = usernameInput.value.trim();
+            
+            // Clear previous errors
+            errorDiv.classList.remove('show');
+            usernameInput.style.borderColor = '';
+            
+            if (!username) {
+                errorDiv.textContent = 'Username is required';
+                errorDiv.classList.add('show');
+                usernameInput.style.borderColor = '#ef4444';
+                return;
+            }
+            
+            try {
+                console.log('Updating username:', username);
+                const response = await fetch(`${API_URL}/api/users/${currentUser.id}/username`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: username })
+                });
+                
+                console.log('Username update response status:', response.status);
+                
+                if (response.ok) {
+                    const updatedUser = await response.json();
+                    console.log('Username updated successfully:', updatedUser);
+                    currentUser = updatedUser;
+                    sessionStorage.setItem('userData', JSON.stringify(updatedUser));
+                    showSuccess('Username updated successfully!');
+                    errorDiv.classList.remove('show');
+                    usernameInput.style.borderColor = '';
+                    // Update the input field with the new value
+                    usernameInput.value = updatedUser.username;
+                } else {
+                    const error = await response.json();
+                    console.error('Username update error:', error);
+                    errorDiv.textContent = error.detail || 'Failed to update username';
+                    errorDiv.classList.add('show');
+                    usernameInput.style.borderColor = '#ef4444';
+                }
+            } catch (error) {
+                console.error('Error updating username:', error);
+                errorDiv.textContent = `Error updating username: ${error.message || 'Please try again'}`;
+                errorDiv.classList.add('show');
+                usernameInput.style.borderColor = '#ef4444';
+            }
+        }
+
+        async function updatePassword() {
+            const passwordInput = document.getElementById('password-input');
+            const passwordConfirmInput = document.getElementById('password-confirm-input');
+            const errorDiv = document.getElementById('password-error');
+            const password = passwordInput.value;
+            const passwordConfirm = passwordConfirmInput.value;
+            
+            // Clear previous errors
+            errorDiv.classList.remove('show');
+            passwordInput.style.borderColor = '';
+            passwordConfirmInput.style.borderColor = '';
+            
+            // Validate password
+            const passwordValidation = validatePassword(password);
+            if (!passwordValidation.valid) {
+                errorDiv.textContent = passwordValidation.message;
+                errorDiv.classList.add('show');
+                passwordInput.style.borderColor = '#ef4444';
+                return;
+            }
+            
+            // Check password confirmation
+            if (password !== passwordConfirm) {
+                errorDiv.textContent = 'Passwords do not match';
+                errorDiv.classList.add('show');
+                passwordConfirmInput.style.borderColor = '#ef4444';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/api/users/${currentUser.id}/password`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: password })
+                });
+                
+                if (response.ok) {
+                    showSuccess('Password updated successfully!');
+                    passwordInput.value = '';
+                    passwordConfirmInput.value = '';
+                    errorDiv.classList.remove('show');
+                } else {
+                    const error = await response.json();
+                    errorDiv.textContent = error.detail || 'Failed to update password';
+                    errorDiv.classList.add('show');
+                }
+            } catch (error) {
+                console.error('Error updating password:', error);
+                errorDiv.textContent = 'Error updating password. Please try again.';
+                errorDiv.classList.add('show');
+            }
+        }
+
+        async function updateCardNumber() {
+            const cardSelect = document.getElementById('card-select');
+            const cardTypeSelect = document.getElementById('card-type-select');
+            const cardNumberInput = document.getElementById('card-number-input');
+            const errorDiv = document.getElementById('card-error');
+            const cardId = cardSelect.value;
+            const cardType = cardTypeSelect.value;
+            let cardNumber = cardNumberInput.value.replace(/\s/g, '');
+            
+            // Clear previous errors
+            errorDiv.classList.remove('show');
+            cardNumberInput.style.borderColor = '';
+            
+            if (!cardId) {
+                errorDiv.textContent = 'Please select a card';
+                errorDiv.classList.add('show');
+                cardSelect.style.borderColor = '#ef4444';
+                return;
+            }
+            
+            if (!cardNumber || cardNumber.length !== 16) {
+                errorDiv.textContent = 'Card number must be exactly 16 digits';
+                errorDiv.classList.add('show');
+                cardNumberInput.style.borderColor = '#ef4444';
+                return;
+            }
+            
+            if (!/^\d+$/.test(cardNumber)) {
+                errorDiv.textContent = 'Card number must contain only digits';
+                errorDiv.classList.add('show');
+                cardNumberInput.style.borderColor = '#ef4444';
+                return;
+            }
+            
+            try {
+                console.log('Updating card number:', { cardId, cardType, cardNumber });
+                const response = await fetch(`${API_URL}/api/cards/${cardId}/number`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        full_card_number: cardNumber,
+                        card_type: cardType
+                    })
+                });
+                
+                console.log('Card update response status:', response.status);
+                
+                if (response.ok) {
+                    const updatedCard = await response.json();
+                    console.log('Card updated successfully:', updatedCard);
+                    showSuccess('Card number and type updated successfully!');
+                    errorDiv.classList.remove('show');
+                    cardNumberInput.style.borderColor = '';
+                    cardSelect.style.borderColor = '';
+                    await loadUserCards(); // Reload cards
+                } else {
+                    const error = await response.json();
+                    console.error('Card update error:', error);
+                    errorDiv.textContent = error.detail || 'Failed to update card number';
+                    errorDiv.classList.add('show');
+                }
+            } catch (error) {
+                console.error('Error updating card number:', error);
+                errorDiv.textContent = `Error updating card number: ${error.message || 'Please try again'}`;
+                errorDiv.classList.add('show');
+            }
+        }
+
+        async function createCreditCard(event) {
+            event.preventDefault();
+            
+            const nameInput = document.getElementById('new-card-name');
+            const numberInput = document.getElementById('new-card-number');
+            const expiryInput = document.getElementById('new-card-expiry');
+            const cvvInput = document.getElementById('new-card-cvv');
+            const errorDiv = document.getElementById('new-card-error');
+            
+            if (!errorDiv) return;
+            errorDiv.classList.remove('show');
+            errorDiv.textContent = '';
+            
+            if (!currentUser || !currentUser.id) {
+                errorDiv.textContent = 'User not found. Please log in again.';
+                errorDiv.classList.add('show');
+                return;
+            }
+            
+            const cardholderName = nameInput.value.trim();
+            let cardNumber = numberInput.value.replace(/\s/g, '');
+            const expiry = expiryInput.value.trim();
+            const cvv = cvvInput.value.trim();
+            
+            if (!cardholderName) {
+                errorDiv.textContent = 'Cardholder name is required';
+                errorDiv.classList.add('show');
+                nameInput.focus();
+                return;
+            }
+            
+            if (!/^\d{16}$/.test(cardNumber)) {
+                errorDiv.textContent = 'Card number must be exactly 16 digits';
+                errorDiv.classList.add('show');
+                numberInput.focus();
+                return;
+            }
+            
+            const expiryPattern = /^(0[1-9]|1[0-2])\/\d{2}$/;
+            if (!expiryPattern.test(expiry)) {
+                errorDiv.textContent = 'Expiry date must be in MM/YY format';
+                errorDiv.classList.add('show');
+                expiryInput.focus();
+                return;
+            }
+            
+            if (!/^\d{3,4}$/.test(cvv)) {
+                errorDiv.textContent = 'CVV must be 3 or 4 digits';
+                errorDiv.classList.add('show');
+                cvvInput.focus();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/api/cards/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        cardholder_name: cardholderName,
+                        card_number: cardNumber,
+                        expiry_date: expiry,
+                        cvv: cvv
+                    })
+                });
+                
+                if (response.ok) {
+                    const newCard = await response.json();
+                    console.log('Card created:', newCard);
+                    showSuccess('Card added successfully!');
+                    resetAddCardForm();
+                    await loadUserCards();
+                } else {
+                    const errorText = await response.text();
+                    let errorMessage = 'Failed to add card';
+                    try {
+                        const error = JSON.parse(errorText);
+                        errorMessage = error.detail || errorMessage;
+                    } catch {
+                        if (errorText) {
+                            errorMessage = errorText;
+                        }
+                    }
+                    errorDiv.textContent = errorMessage;
+                    errorDiv.classList.add('show');
+                }
+            } catch (error) {
+                console.error('Error creating card:', error);
+                errorDiv.textContent = `Error creating card: ${error.message || 'Please try again'}`;
+                errorDiv.classList.add('show');
+            }
+        }
+
+        function resetAddCardForm() {
+            document.getElementById('add-card-form').reset();
+            const errorDiv = document.getElementById('new-card-error');
+            if (errorDiv) {
+                errorDiv.textContent = '';
+                errorDiv.classList.remove('show');
+            }
+        }
+
+        async function updateSalary() {
+            const salaryInput = document.getElementById('salary-input');
+            const errorDiv = document.getElementById('salary-error');
+            const salary = parseFloat(salaryInput.value);
+            
+            // Clear previous errors
+            errorDiv.classList.remove('show');
+            salaryInput.style.borderColor = '';
+            
+            if (isNaN(salary) || salary < 0) {
+                errorDiv.textContent = 'Please enter a valid salary amount';
+                errorDiv.classList.add('show');
+                salaryInput.style.borderColor = '#ef4444';
+                return;
+            }
+            
+            try {
+                console.log('Updating salary:', salary);
+                const response = await fetch(`${API_URL}/api/users/${currentUser.id}/salary`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ salary: salary })
+                });
+                
+                console.log('Salary update response status:', response.status);
+                
+                if (response.ok) {
+                    const updatedUser = await response.json();
+                    console.log('Salary updated successfully:', updatedUser);
+                    currentUser = updatedUser;
+                    sessionStorage.setItem('userData', JSON.stringify(updatedUser));
+                    showSuccess('Salary updated successfully!');
+                    errorDiv.classList.remove('show');
+                    salaryInput.style.borderColor = '';
+                    // Update the input field with the new value
+                    salaryInput.value = updatedUser.salary || 0;
+                } else {
+                    const error = await response.json();
+                    console.error('Salary update error:', error);
+                    errorDiv.textContent = error.detail || 'Failed to update salary';
+                    errorDiv.classList.add('show');
+                    salaryInput.style.borderColor = '#ef4444';
+                }
+            } catch (error) {
+                console.error('Error updating salary:', error);
+                errorDiv.textContent = `Error updating salary: ${error.message || 'Please try again'}`;
+                errorDiv.classList.add('show');
+                salaryInput.style.borderColor = '#ef4444';
+            }
+        }
+
+        async function addTransaction(event) {
+            event.preventDefault();
+            
+            const cardId = document.getElementById('transaction-card-select').value;
+            const merchant = document.getElementById('transaction-merchant').value.trim();
+            const amount = parseFloat(document.getElementById('transaction-amount').value);
+            const transactionType = document.getElementById('transaction-type').value;
+            const description = document.getElementById('transaction-description').value.trim();
+            
+            // Validation
+            if (!merchant) {
+                alert('Please enter a merchant/description');
+                document.getElementById('transaction-merchant').focus();
+                return;
+            }
+            
+            if (isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid amount greater than 0');
+                document.getElementById('transaction-amount').focus();
+                return;
+            }
+            
+            if (!currentUser || !currentUser.id) {
+                alert('User not found. Please login again.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Build request body - card_id is optional
+            const requestBody = {
+                user_id: currentUser.id,
+                merchant: merchant,
+                amount: amount,
+                transaction_type: transactionType,
+                description: description || merchant
+            };
+            
+            // Only add card_id if a card is selected
+            if (cardId && cardId !== '' && cardId !== '0') {
+                requestBody.card_id = parseInt(cardId);
+            }
+            
+            console.log('Creating transaction:', requestBody);
+            
+            try {
+                const response = await fetch(`${API_URL}/api/transactions/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (response.ok) {
+                    const transaction = await response.json();
+                    console.log('Transaction created:', transaction);
+                    showSuccess(`Transaction added successfully! Amount: $${amount.toFixed(2)}`);
+                    resetTransactionForm();
+                    
+                    // Update user balance in session
+                    try {
+                        const userResponse = await fetch(`${API_URL}/api/users/${currentUser.id}`);
+                        if (userResponse.ok) {
+                            const updatedUser = await userResponse.json();
+                            currentUser = updatedUser;
+                            sessionStorage.setItem('userData', JSON.stringify(updatedUser));
+                        }
+                    } catch (err) {
+                        console.error('Error updating user data:', err);
+                    }
+                } else {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    let errorMessage = 'Failed to add transaction';
+                    try {
+                        const error = JSON.parse(errorText);
+                        errorMessage = error.detail || errorMessage;
+                    } catch (e) {
+                        errorMessage = errorText || errorMessage;
+                    }
+                    alert(errorMessage);
+                }
+            } catch (error) {
+                console.error('Error adding transaction:', error);
+                alert(`Error adding transaction: ${error.message || 'Please check console for details'}`);
+            }
+        }
+
+        function resetTransactionForm() {
+            document.getElementById('transaction-merchant').value = '';
+            document.getElementById('transaction-amount').value = '';
+            document.getElementById('transaction-type').value = 'debit';
+            document.getElementById('transaction-description').value = '';
+            document.getElementById('transaction-card-select').value = '';
+        }
+
+        function handleCardNumberInput(e) {
+            let value = e.target.value.replace(/\s/g, '').replace(/\D/g, '');
+            if (value.length > 16) value = value.slice(0, 16);
+            value = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = value;
+        }
+        
+        const existingCardNumberInput = document.getElementById('card-number-input');
+        if (existingCardNumberInput) {
+            existingCardNumberInput.addEventListener('input', handleCardNumberInput);
+        }
+        
+        const newCardNumberInput = document.getElementById('new-card-number');
+        if (newCardNumberInput) {
+            newCardNumberInput.addEventListener('input', handleCardNumberInput);
+        }
+        
+        const newCardExpiryInput = document.getElementById('new-card-expiry');
+        if (newCardExpiryInput) {
+            newCardExpiryInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '').slice(0, 4);
+                if (value.length >= 3) {
+                    value = `${value.slice(0, 2)}/${value.slice(2, 4)}`;
+                } else if (value.length >= 1 && value.length <= 2) {
+                    value = value;
+                }
+                e.target.value = value;
+            });
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.textContent = message;
+            successDiv.classList.add('show');
+            setTimeout(() => {
+                successDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        function validateEmail(email) {
+            if (!email || typeof email !== 'string') {
+                return { valid: false, message: 'Email is required' };
+            }
+            const trimmedEmail = email.trim();
+            if (trimmedEmail.length === 0) {
+                return { valid: false, message: 'Email is required' };
+            }
+            if (!trimmedEmail.includes('@')) {
+                return { valid: false, message: 'Email must contain @ symbol' };
+            }
+            if (trimmedEmail.startsWith('@') || trimmedEmail.endsWith('@')) {
+                return { valid: false, message: 'Please enter a valid email address' };
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(trimmedEmail)) {
+                return { valid: false, message: 'Please enter a valid email address (format: user@domain.com)' };
+            }
+            return { valid: true };
+        }
+
+        function validatePassword(password) {
+            if (!password || typeof password !== 'string') {
+                return { valid: false, message: 'Password is required' };
+            }
+            if (password.length < 8) {
+                return { valid: false, message: 'Password must be at least 8 characters long' };
+            }
+            if (!/[A-Z]/.test(password)) {
+                return { valid: false, message: 'Password must contain at least one uppercase letter (A-Z)' };
+            }
+            if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+                return { valid: false, message: 'Password must contain at least one symbol (!@#$%^&* etc.)' };
+            }
+            return { valid: true };
+        }
+
+        async function getUserAvatarUrl(name, seed, userId = null) {
+            if (userId) {
+                try {
+                    const userResponse = await fetch(`${API_URL}/api/users/${userId}`);
+                    if (userResponse.ok) {
+                        const user = await userResponse.json();
+                        if (user.avatar_url) {
+                            return user.avatar_url;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching user avatar:', error);
+                }
+            }
+            try {
+                const response = await fetch(`${API_URL}/api/avatar/generate?name=${encodeURIComponent(name || 'User')}&seed=${encodeURIComponent(seed || name || 'default')}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.avatar_url;
+                }
+            } catch (error) {
+                console.error('Error generating avatar:', error);
+            }
+            const encodedName = encodeURIComponent(name || 'User');
+            return `https://ui-avatars.com/api/?name=${encodedName}&size=128&background=random&color=fff&bold=true&format=png`;
+        }
+
+        function goToPage(page) {
+            window.location.href = page;
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
+

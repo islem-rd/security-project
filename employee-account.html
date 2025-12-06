@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRBank - Employee Account Settings</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-turquoise: #00d9ff;
+            --secondary-turquoise: #00ffcc;
+            --dark-turquoise: #008b9e;
+            --bg-dark: #0a0a0f;
+            --bg-card: rgba(20, 20, 30, 0.85);
+            --text-primary: #ffffff;
+            --text-secondary: #a0d8e8;
+            --glow-primary: rgba(0, 217, 255, 0.4);
+            --glow-secondary: rgba(0, 255, 204, 0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--primary-turquoise) 0%, transparent 70%);
+            top: -250px;
+            left: 50%;
+            opacity: 0.08;
+            animation: float 20s ease-in-out infinite;
+            z-index: 0;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, 0) scale(1); }
+            50% { transform: translate(-50%, 50px) scale(1.1); }
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar - Same as employee.html */
+        .sidebar {
+            width: 200px;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            padding: 25px 20px;
+            border-right: 1px solid rgba(0, 217, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: var(--glow-turquoise);
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: var(--glow-turquoise); }
+            50% { box-shadow: var(--glow-secondary); }
+        }
+
+        .mode-indicator {
+            margin-bottom: 30px;
+            font-size: 13px;
+            padding: 10px 14px;
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid rgba(255, 59, 48, 0.3);
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .mode-indicator .value {
+            color: #ff3b30;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 217, 255, 0.1);
+            border-color: rgba(0, 217, 255, 0.3);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: var(--accent-gradient);
+            color: white;
+            box-shadow: var(--glow-turquoise);
+            transform: translateX(5px);
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        .logout-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-turquoise), var(--secondary-turquoise));
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 20px var(--glow-primary);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px var(--glow-primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 35px;
+            background: transparent;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header-title {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-turquoise), var(--secondary-turquoise));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-turquoise), var(--secondary-turquoise));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-dark);
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px var(--glow-primary);
+        }
+        
+        .profile-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 30px var(--glow-secondary);
+        }
+
+        /* Settings Sections */
+        .settings-container {
+            max-width: 900px;
+        }
+
+        .settings-section {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 28px;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-turquoise);
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid rgba(0, 217, 255, 0.3);
+            text-shadow: 0 0 20px var(--glow-primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(10, 10, 15, 0.6);
+            color: var(--text-primary);
+        }
+        
+        .form-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-turquoise);
+            box-shadow: 0 0 20px var(--glow-primary);
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        .form-help {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            opacity: 0.8;
+        }
+
+        .form-error {
+            font-size: 12px;
+            color: #ff6b6b;
+            margin-top: 6px;
+            display: none;
+            padding: 8px 12px;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 6px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .form-error.show {
+            display: block;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-turquoise), var(--secondary-turquoise));
+            color: var(--bg-dark);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px var(--glow-primary);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .success-message {
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--secondary-turquoise);
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            display: none;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            font-weight: 600;
+            box-shadow: 0 4px 15px var(--glow-secondary);
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                        <rect x="2" y="5" width="20" height="14" rx="2"/>
+                        <line x1="2" y1="10" x2="22" y2="10"/>
+                        <circle cx="6" cy="15" r="1" fill="currentColor"/>
+                        <line x1="10" y1="15" x2="14" y2="15"/>
+                    </svg>
+                </div>
+                <span>IRbank</span>
+            </div>
+
+            <div class="mode-indicator">
+                Mode: <span class="value" id="employeeRole">employee</span>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item" onclick="goToPage('employee.html')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                    </div>
+                    <span>Overview</span>
+                </li>
+                <li class="nav-item" onclick="goToPage('employee-messages.html')">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                            <line x1="2" y1="18" x2="9" y2="13"/>
+                            <line x1="22" y1="18" x2="15" y2="13"/>
+                        </svg>
+                    </div>
+                    <span>Messages</span>
+                </li>
+                <li class="nav-item active">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="8" r="5"/>
+                            <path d="M3 21c0-4.4 4-8 9-8s9 3.6 9 8"/>
+                            <circle cx="12" cy="8" r="2" fill="currentColor"/>
+                            <path d="M12 10c-1.1 0-2-.9-2-2"/>
+                        </svg>
+                    </div>
+                    <span>Account</span>
+                </li>
+                <li class="nav-item" id="dbProjectionNav" data-page="employee-iam.html" style="display: none;">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" stroke-width="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                            <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                        </svg>
+                    </div>
+                    <span>IAM & RBAC</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="header-title">Account Settings</h1>
+                <div class="header-right">
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                    <div class="profile-icon" id="employee-profile-icon">👤</div>
+                </div>
+            </div>
+
+            <div class="settings-container">
+                <div id="success-message" class="success-message"></div>
+
+                <!-- Username Section -->
+                <div class="settings-section">
+                    <h2 class="section-title">Username</h2>
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" id="username-input" class="form-input" placeholder="your_username">
+                        <div class="form-error" id="username-error"></div>
+                        <div class="form-help">Username must be unique and not already in use</div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="updateUsername()">Update Username</button>
+                    </div>
+                </div>
+
+                <!-- Password Section -->
+                <div class="settings-section">
+                    <h2 class="section-title">Password</h2>
+                    <div class="form-group">
+                        <label class="form-label">New Password</label>
+                        <input type="password" id="password-input" class="form-input" placeholder="Enter new password">
+                        <div class="form-error" id="password-error"></div>
+                        <div class="form-help">Must be at least 8 characters with 1 uppercase letter and 1 symbol</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" id="password-confirm-input" class="form-input" placeholder="Confirm new password">
+                        <div class="form-error" id="password-confirm-error"></div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="updatePassword()">Update Password</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let currentEmployee = null;
+
+        // Load employee data on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkEmployeeAuth();
+            await loadEmployeeData();
+        });
+
+        async function checkEmployeeAuth() {
+            try {
+                const userType = sessionStorage.getItem('userType');
+                const employeeData = sessionStorage.getItem('employeeData');
+                
+                if (!employeeData || userType !== 'employee') {
+                    if (userType === 'user') {
+                        alert('You are logged in as a user. Redirecting to user dashboard...');
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        alert('Please login as an employee first');
+                        window.location.href = 'index.html';
+                    }
+                    return;
+                }
+            } catch (error) {
+                console.error('Error checking employee auth:', error);
+                window.location.href = 'index.html';
+            }
+        }
+
+        async function loadEmployeeData() {
+            try {
+                const employeeData = sessionStorage.getItem('employeeData');
+                if (!employeeData) return;
+                
+                currentEmployee = JSON.parse(employeeData);
+                
+                // Populate form fields
+                document.getElementById('username-input').value = currentEmployee.username || '';
+                
+                // Update avatar
+                const employeeName = currentEmployee.full_name || currentEmployee.username || 'Employee';
+                const avatarUrl = currentEmployee.avatar_url || await getUserAvatarUrl(employeeName, currentEmployee.email || currentEmployee.id, currentEmployee.id);
+                const profileIcon = document.getElementById('employee-profile-icon');
+                if (profileIcon) {
+                    profileIcon.innerHTML = `<img src="${avatarUrl}" alt="${employeeName}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; cursor: pointer;" onerror="this.parentElement.innerHTML='👤';">`;
+                }
+            } catch (error) {
+                console.error('Error loading employee data:', error);
+            }
+        }
+
+        async function updateUsername() {
+            const usernameInput = document.getElementById('username-input');
+            const errorDiv = document.getElementById('username-error');
+            const username = usernameInput.value.trim();
+            
+            if (!username) {
+                errorDiv.textContent = 'Username is required';
+                errorDiv.classList.add('show');
+                usernameInput.style.borderColor = '#ef4444';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/api/employees/${currentEmployee.id}/username`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: username })
+                });
+                
+                if (response.ok) {
+                    const updatedEmployee = await response.json();
+                    currentEmployee = updatedEmployee;
+                    sessionStorage.setItem('employeeData', JSON.stringify(updatedEmployee));
+                    showSuccess('Username updated successfully!');
+                    errorDiv.classList.remove('show');
+                    usernameInput.style.borderColor = '';
+                } else {
+                    const error = await response.json();
+                    errorDiv.textContent = error.detail || 'Failed to update username';
+                    errorDiv.classList.add('show');
+                    usernameInput.style.borderColor = '#ef4444';
+                }
+            } catch (error) {
+                console.error('Error updating username:', error);
+                errorDiv.textContent = 'Error updating username. Please try again.';
+                errorDiv.classList.add('show');
+            }
+        }
+
+        async function updatePassword() {
+            const passwordInput = document.getElementById('password-input');
+            const passwordConfirmInput = document.getElementById('password-confirm-input');
+            const errorDiv = document.getElementById('password-error');
+            const password = passwordInput.value;
+            const passwordConfirm = passwordConfirmInput.value;
+            
+            // Clear previous errors
+            errorDiv.classList.remove('show');
+            passwordInput.style.borderColor = '';
+            passwordConfirmInput.style.borderColor = '';
+            
+            // Validate password
+            const passwordValidation = validatePassword(password);
+            if (!passwordValidation.valid) {
+                errorDiv.textContent = passwordValidation.message;
+                errorDiv.classList.add('show');
+                passwordInput.style.borderColor = '#ef4444';
+                return;
+            }
+            
+            // Check password confirmation
+            if (password !== passwordConfirm) {
+                errorDiv.textContent = 'Passwords do not match';
+                errorDiv.classList.add('show');
+                passwordConfirmInput.style.borderColor = '#ef4444';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/api/employees/${currentEmployee.id}/password`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: password })
+                });
+                
+                if (response.ok) {
+                    showSuccess('Password updated successfully!');
+                    passwordInput.value = '';
+                    passwordConfirmInput.value = '';
+                    errorDiv.classList.remove('show');
+                } else {
+                    const error = await response.json();
+                    errorDiv.textContent = error.detail || 'Failed to update password';
+                    errorDiv.classList.add('show');
+                }
+            } catch (error) {
+                console.error('Error updating password:', error);
+                errorDiv.textContent = 'Error updating password. Please try again.';
+                errorDiv.classList.add('show');
+            }
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.textContent = message;
+            successDiv.classList.add('show');
+            setTimeout(() => {
+                successDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        function validatePassword(password) {
+            if (!password || typeof password !== 'string') {
+                return { valid: false, message: 'Password is required' };
+            }
+            if (password.length < 8) {
+                return { valid: false, message: 'Password must be at least 8 characters long' };
+            }
+            if (!/[A-Z]/.test(password)) {
+                return { valid: false, message: 'Password must contain at least one uppercase letter (A-Z)' };
+            }
+            if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+                return { valid: false, message: 'Password must contain at least one symbol (!@#$%^&* etc.)' };
+            }
+            return { valid: true };
+        }
+
+        async function getUserAvatarUrl(name, seed, employeeId = null) {
+            if (employeeId) {
+                try {
+                    const employeeResponse = await fetch(`${API_URL}/api/employees/${employeeId}`);
+                    if (employeeResponse.ok) {
+                        const employee = await employeeResponse.json();
+                        if (employee.avatar_url) {
+                            return employee.avatar_url;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching employee avatar:', error);
+                }
+            }
+            try {
+                const response = await fetch(`${API_URL}/api/avatar/generate?name=${encodeURIComponent(name || 'Employee')}&seed=${encodeURIComponent(seed || name || 'default')}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.avatar_url;
+                }
+            } catch (error) {
+                console.error('Error generating avatar:', error);
+            }
+            const encodedName = encodeURIComponent(name || 'Employee');
+            return `https://ui-avatars.com/api/?name=${encodedName}&size=128&background=random&color=fff&bold=true&format=png`;
+        }
+
+        function goToPage(page) {
+            window.location.href = page;
+        }
+
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        // Check if employee is admin and update UI
+        (function checkAdminRole() {
+            const employeeData = sessionStorage.getItem('employeeData');
+            if (employeeData) {
+                try {
+                    const employee = JSON.parse(employeeData);
+                    if (employee.role === 'admin') {
+                        document.getElementById('employeeRole').textContent = 'admin';
+                        const dbProjectionNav = document.getElementById('dbProjectionNav');
+                        if (dbProjectionNav) {
+                            dbProjectionNav.style.display = 'flex';
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error parsing employee data:', e);
+                }
+            }
+        })();
+    </script>
+</body>
+</html>
+
