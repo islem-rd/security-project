@@ -139,9 +139,6 @@ Il s'agit d'une plateforme bancaire web moderne qui fournit des services financi
 ### Instructions d'Installation
 
 1. **Cloner le dépôt**
-```bash
-cd "c:\Users\islam\Downloads\code (1)"
-```
 
 2. **Configurer l'environnement virtuel Python**
 
@@ -199,9 +196,6 @@ Pour activer la connexion Google, suivez ces étapes :
 6. Dans `index.html`, remplacez `YOUR_GOOGLE_CLIENT_ID_HERE` par votre Client ID
 
 5. **Initialiser la base de données**
-```bash
-python create_test_data.py
-```
 
 6. **Démarrer le serveur**
 ```bash
